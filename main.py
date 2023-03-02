@@ -14,14 +14,23 @@ class MyWindow(QMainWindow):
         name = self.kiwoom.GetMasterCodeName("005930")
 
         connectState = self.kiwoom.GetConnectState()
-        # userInfo = self.kiwoom.GetLoginInfo()
+        lastPrice = self.kiwoom.GetMasterLastPrice("005930")
+
+        print("연결상태 : %d" %connectState)
+        print("유저정보")
+        print("------------------------------")
         print(self.kiwoom.GetLoginInfo("ACCOUNT_CNT"))
         print(self.kiwoom.GetLoginInfo("ACCNO"))
         print(self.kiwoom.GetLoginInfo("USER_ID"))
         print(self.kiwoom.GetLoginInfo("USER_NAME"))
         print(self.kiwoom.GetLoginInfo("KEY_BSECGB"))
         print(self.kiwoom.GetLoginInfo("FIREW_SECGB"))
+        print("------------------------------")
         print(name)
+        print("------------------------------")
+        print("전일가 : %s" %lastPrice)
+
+
 
 
 

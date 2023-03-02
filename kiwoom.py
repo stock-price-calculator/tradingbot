@@ -53,4 +53,10 @@ class Kiwoom:
         result = self.ocx.dynamicCall("GetLoginInfo(QString)", tag)
         return result
 
+    # 전일가
+    def GetMasterLastPrice(self,code):
+        result = self.ocx.dynamicCall("GetMasterLastPrice(QString)",code)
+        return result
+
+
 
