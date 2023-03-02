@@ -12,12 +12,18 @@ class MyWindow(QMainWindow):
 
         # tr 요청
         name = self.kiwoom.GetMasterCodeName("005930")
-        name1 = self.kiwoom.SetInputValue("종목코드", "005930")
-        name2 = self.kiwoom.CommRqData("opt10001", "opt10001", 0, "0101")
 
+        connectState = self.kiwoom.GetConnectState()
+        # userInfo = self.kiwoom.GetLoginInfo()
+        print(self.kiwoom.GetLoginInfo("ACCOUNT_CNT"))
+        print(self.kiwoom.GetLoginInfo("ACCNO"))
+        print(self.kiwoom.GetLoginInfo("USER_ID"))
+        print(self.kiwoom.GetLoginInfo("USER_NAME"))
+        print(self.kiwoom.GetLoginInfo("KEY_BSECGB"))
+        print(self.kiwoom.GetLoginInfo("FIREW_SECGB"))
         print(name)
-        print(name1)
-        print(name2)
+
+
 
 
 if __name__ == "__main__":
