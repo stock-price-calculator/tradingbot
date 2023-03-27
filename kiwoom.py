@@ -49,21 +49,22 @@ class Kiwoom:
         result = self.ocx.dynamicCall("GetMasterLastPrice(QString)", code)
         return result
 
-    # 매수주문
-    def send_buy_order(self, account_number, stock_code, stock_quantity, price, trading_type):
+    # 매수, 매도
+    def send_order(self, account_number, order_type, stock_code, stock_quantity, price, trading_type, original_order):
 
-        tradin_result = self.changed_trading_type(trading_type)
+        trading_result = self.changed_trading_type(trading_type)
+        order_type = self.change_order_type(order_type)
 
         order_params = {
             "rq_name": "RQ_1",
             "screen_number": "0101",
             "account_number": account_number,
-            "order_type": constants.NEW_BUY,
+            "order_type": order_type,
             "code": stock_code,
             "stock_quantity": stock_quantity,
             "price": price,
-            "trading_type": tradin_result,
-            "origin_order_number": "",
+            "trading_type": trading_result,
+            "origin_order_number": original_order,
         }
 
         result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
@@ -77,8 +78,11 @@ class Kiwoom:
             return constants.MARKET_PRICE_VALUE
 
     def change_order_type(self, name):
-
-        if (name == "매수취소"):
+        if (name == "신규매수"):
+            return constants.NEW_BUY
+        elif (name == "신규매도"):
+            return constants.NEW_SELL
+        elif (name == "매수취소"):
             return constants.CANCEL_BUY
         elif (name == "매도취소"):
             return constants.CANCEL_SELL
@@ -89,8 +93,4 @@ class Kiwoom:
         else:
             return constants.ERROR_CODE
 
-    #
-    # def GetRQNameType(RQName):
-    #
-    #
-    # def GetOrderType():
+

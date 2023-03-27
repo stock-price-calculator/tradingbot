@@ -31,7 +31,8 @@ class MyWindow(QMainWindow):
         print("전일가 : %s" %lastPrice)
 
 
-
+        buy_order = self.kiwoom.send_buy_order("8043137211", "신규매수" "005930", 1, 0,"시장가")
+        print(buy_order)
 
 
 
