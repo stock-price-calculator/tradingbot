@@ -6,32 +6,31 @@ from PyQt5.QtWidgets import *
 
 from kiwoom import Kiwoom
 
-
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.kiwoom = Kiwoom()
-        self.kiwoom.CommConnect()
+        self.kiwoom.comm_connect()
 
         # tr 요청
-        name = self.kiwoom.GetMasterCodeName("005930")
+        name = self.kiwoom.get_master_code_name("005930")
 
-        connectState = self.kiwoom.GetConnectState()
-        lastPrice = self.kiwoom.GetMasterLastPrice("005930")
+        connectState = self.kiwoom.get_connect_state()
+        lastPrice = self.kiwoom.get_master_last_price("005930")
 
         print("연결상태 : %d" %connectState)
         print("유저정보")
         print("------------------------------")
-        print(self.kiwoom.GetLoginInfo("ACCOUNT_CNT"))
-        print(self.kiwoom.GetLoginInfo("ACCNO"))
-        print(self.kiwoom.GetLoginInfo("USER_ID"))
-        print(self.kiwoom.GetLoginInfo("USER_NAME"))
-        print(self.kiwoom.GetLoginInfo("KEY_BSECGB"))
-        print(self.kiwoom.GetLoginInfo("FIREW_SECGB"))
+        print("계좌 수 : " + self.kiwoom.get_login_info("ACCOUNT_CNT"))
+        print("계좌 번호 : " + self.kiwoom.get_login_info("ACCNO"))
+        print(self.kiwoom.get_login_info("USER_ID"))
+        print(self.kiwoom.get_login_info("USER_NAME"))
         print("------------------------------")
         print(name)
         print("------------------------------")
         print("전일가 : %s" %lastPrice)
+
+
 
 
 
