@@ -1,8 +1,11 @@
 import sys
-from PyQt5.QtWidgets import *
-from kiwoom import Kiwoom
-from PyQt5.QAxContainer import *
+
 import pythoncom
+from PyQt5.QAxContainer import *
+from PyQt5.QtWidgets import *
+
+from kiwoom import Kiwoom
+
 
 class MyWindow(QMainWindow):
     def __init__(self):

@@ -1,5 +1,6 @@
-from PyQt5.QAxContainer import *
 import pythoncom
+from PyQt5.QAxContainer import *
+
 
 class Kiwoom:
     def __init__(self):
@@ -57,6 +58,7 @@ class Kiwoom:
     def GetMasterLastPrice(self,code):
         result = self.ocx.dynamicCall("GetMasterLastPrice(QString)",code)
         return result
+0.
 
 
 
