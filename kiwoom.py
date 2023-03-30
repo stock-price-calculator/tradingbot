@@ -86,7 +86,43 @@ class Kiwoom:
             "origin_order_number": '',
         }
         result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                             list(order_params.values()), )
+                                      list(order_params.values()), )
+        return result
+
+    # SendOrder 호출
+    def cancel_buy_order(self, account, item_code, quantity, price, trading_type, original_order_num):
+
+        order_params = {
+            "rq_name": "매수취소주문",
+            "screen_number": "0101",
+            "account_number": account,
+            "order_type": constants.CANCEL_BUY,
+            "code": item_code,
+            "stock_quantity": quantity,
+            "price": price,
+            "trading_type": self.changed_trading_type(trading_type),
+            "origin_order_number": original_order_num,
+        }
+        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+                                      list(order_params.values()), )
+        return result
+
+    # SendOrder 호출
+    def cancel_sell_order(self, account, item_code, quantity, price, trading_type, original_order_num):
+        order_params = {
+            "rq_name": "매도취소주문",
+            "screen_number": "0101",
+            "account_number": account,
+            "order_type": constants.CANCEL_BUY,
+            "code": item_code,
+            "stock_quantity": quantity,
+            "price": price,
+            "trading_type": self.changed_trading_type(trading_type),
+            "origin_order_number": original_order_num,
+        }
+
+        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+                                      list(order_params.values()), )
         return result
 
     def changed_trading_type(self, name):
