@@ -50,28 +50,7 @@ class Kiwoom:
         return result
 
     def get_chejan_data(self, value):
-        result = self.ocx.dynamicCall("GetChejanData(int)" ,value)
-        return result
-    # 매수, 매도
-    def send_order(self, account_number, order_type, stock_code, stock_quantity, price, trading_type, original_order):
-
-        trading_result = self.changed_trading_type(trading_type)
-        order_type = self.change_order_type(order_type)
-
-        order_params = {
-            "rq_name": "RQ_1",
-            "screen_number": "0101",
-            "account_number": account_number,
-            "order_type": order_type,
-            "code": stock_code,
-            "stock_quantity": stock_quantity,
-            "price": price,
-            "trading_type": trading_result,
-            "origin_order_number": original_order,
-        }
-
-        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                      list(order_params.values()), )
+        result = self.ocx.dynamicCall("GetChejanData(int)", value)
         return result
 
     # SendOrder 호출
@@ -89,22 +68,26 @@ class Kiwoom:
             "origin_order_number": '',
         }
         result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                             list(order_params.values()), )
+                                      list(order_params.values()), )
         return result
 
     # SendOrder 호출
     def sendSellOrder(self, account, item_code, quantity, price, trading_type):
-        self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                ['신규매도주문',
-                                '0101',
-                                 account,
-                                 constants.NEW_SELL,
-                                 item_code,
-                                 quantity,
-                                 price,
-                                 self.changed_trading_type(trading_type),
-                                 '']
-                                )
+
+        order_params = {
+            "rq_name": "신규매도주문",
+            "screen_number": "0101",
+            "account_number": account,
+            "order_type": constants.NEW_SELL,
+            "code": item_code,
+            "stock_quantity": quantity,
+            "price": price,
+            "trading_type": self.changed_trading_type(trading_type),
+            "origin_order_number": '',
+        }
+        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+                             list(order_params.values()), )
+        return result
 
     def changed_trading_type(self, name):
         if (name == "지정가"):
@@ -127,5 +110,3 @@ class Kiwoom:
             return constants.CHANGE_SELL
         else:
             return constants.ERROR_CODE
-
-

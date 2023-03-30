@@ -35,8 +35,9 @@ class MyWindow(QMainWindow):
         #buy_order = self.kiwoom.sendBuyOrder("8043137211", "005930", 1, 0, "시장가")
         #print(buy_order)
 
-        sell_order = self.kiwoom.sendSellOrder("8043137211", "005930", 1, 0, "시장가")
-        print(sell_order)
+        #sell_order = self.kiwoom.sendSellOrder("8043137211", "005930", 1, 0, "시장가")
+        #print(sell_order)
+
         #print(self.kiwoom.get_chejan_data(11))
 
 
