@@ -49,6 +49,9 @@ class Kiwoom:
         result = self.ocx.dynamicCall("GetMasterLastPrice(QString)", code)
         return result
 
+    def get_chejan_data(self, value):
+        result = self.ocx.dynamicCall("GetChejanData(int)" ,value)
+        return result
     # 매수, 매도
     def send_order(self, account_number, order_type, stock_code, stock_quantity, price, trading_type, original_order):
 
@@ -70,6 +73,38 @@ class Kiwoom:
         result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
                                       list(order_params.values()), )
         return result
+
+    # SendOrder 호출
+    def sendBuyOrder(self, account, item_code, quantity, price, trading_type):
+
+        order_params = {
+            "rq_name": "신규매수주문",
+            "screen_number": "0101",
+            "account_number": account,
+            "order_type": constants.NEW_BUY,
+            "code": item_code,
+            "stock_quantity": quantity,
+            "price": price,
+            "trading_type": self.changed_trading_type(trading_type),
+            "origin_order_number": '',
+        }
+        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+                             list(order_params.values()), )
+        return result
+
+    # SendOrder 호출
+    def sendSellOrder(self, account, item_code, quantity, price, trading_type):
+        self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+                                ['신규매도주문',
+                                '0101',
+                                 account,
+                                 constants.NEW_SELL,
+                                 item_code,
+                                 quantity,
+                                 price,
+                                 self.changed_trading_type(trading_type),
+                                 '']
+                                )
 
     def changed_trading_type(self, name):
         if (name == "지정가"):
