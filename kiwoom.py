@@ -54,7 +54,7 @@ class Kiwoom:
         return result
 
     # SendOrder 호출
-    def sendBuyOrder(self, account, item_code, quantity, price, trading_type):
+    def send_buy_order(self, account, item_code, quantity, price, trading_type):
 
         order_params = {
             "rq_name": "신규매수주문",
@@ -72,7 +72,7 @@ class Kiwoom:
         return result
 
     # SendOrder 호출
-    def sendSellOrder(self, account, item_code, quantity, price, trading_type):
+    def send_sell_order(self, account, item_code, quantity, price, trading_type):
 
         order_params = {
             "rq_name": "신규매도주문",
