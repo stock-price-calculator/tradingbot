@@ -13,17 +13,18 @@ class MyWindow():
 
         while True:
             n = int(input("메뉴번호를 선택하세요 : "))
-            if n == 1:
+            if n == 1:  # 시장가 매수
                 buy_order = self.kiwoom.send_buy_order("8043137211", "005930", 1, 0, "시장가")
                 print("결과값 : ", buy_order)
-            elif n == 2:
+            elif n == 2: # 시장가 매도
                 sell_order = self.kiwoom.send_sell_order("8043137211", "005930", 1, 0, "시장가")
                 print("결과값 : ", sell_order)
-            elif n == 3:
+            elif n == 3: # 테스트
                 self.start_test()
-            elif n == 4:
-                result = self.kiwoom.get_detail_account_info("8043137211","0000","00","2")
-                print(result)
+            elif n == 4: # 예수금
+                self.kiwoom.get_detail_account_info("8043137211")
+            elif n == 5: #총수익률
+                self.kiwoom.get_detail_account_mystock("8043137211")
 
 
     def start_test(self):

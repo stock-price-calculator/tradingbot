@@ -11,11 +11,14 @@ from PyQt5.QAxContainer import *
 class Kiwoom:
     def __init__(self):
 
-        self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
-        self.detail_account_info_event_loop = QEventLoop() # 예수금 담담 이벤트 루프
+        self.plus_price_rate_loop = None
+        self.detail_account_info_event_loop = None
+        self.login_event_loop = None
+        self.ocx = None
 
+        self.create_loop_event()
         self.create_kiwoom_instance()
-        self.set_event_collection()
+        self.connect_event()
         self.connect_login()
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
@@ -23,9 +26,14 @@ class Kiwoom:
         self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
 
     # 이벤트 요청 연결
-    def set_event_collection(self):
+    def connect_event(self):
         self.ocx.OnEventConnect.connect(self.login_slot)
         self.ocx.OnReceiveTrData.connect(self.trdata_slot)
+
+    def create_loop_event(self):
+        self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
+        self.detail_account_info_event_loop = QEventLoop()  # 예수금상세현황요청 담담 이벤트 루프
+        self.plus_price_rate_loop = QEventLoop()  # 계좌평가잔고 루프
 
     # 로그인 메서드 호출
     def connect_login(self):
@@ -40,7 +48,6 @@ class Kiwoom:
             print("로그인에 실패하였습니다.")
             sys.exit(0)
         self.login_event_loop.exit()
-
 
     # 종목코드의 종목명을 반환
     def get_master_code_name(self, code):
@@ -140,14 +147,26 @@ class Kiwoom:
                                       list(order_params.values()), )
         return result
 
-    def get_detail_account_info(self, account, password, pw_mc, division_number):
+    # 예수금상세현황요청
+    def get_detail_account_info(self, account):
         print("계좌번호 및 비밀번호 등을 입력/서버에 요청")
         self.ocx.dynamicCall("SetInputValue(QString,QString)", "계좌번호", account)
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호", password)
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", pw_mc)
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", division_number)
+        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호", "0000")
+        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", "00")
+        self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", "2")
         self.ocx.dynamicCall("CommRqData(QString,QString,int,QString)", "예수금상세현황요청", "opw00001", 0, "2000")
         self.detail_account_info_event_loop.exec_()
+
+    # 계좌평가잔고내역요청
+    def get_detail_account_mystock(self, account, sPrevNext="0"):
+        # 계좌평가 잔고내역 요청
+        # sPrevNext="0" : 싱글데이터 받아오기(종목합계 데이터)
+        self.ocx.dynamicCall("SetInputValue(String, String)", "계좌번호", account)
+        self.ocx.dynamicCall("SetInputValue(String, String)", "비밀번호", "0000")
+        self.ocx.dynamicCall("SetInputValue(String, String)", "비밀번호입력매체구분", "00")
+        self.ocx.dynamicCall("SetInputValue(String, String)", "조회구분", "2")
+        self.ocx.dynamicCall("CommRqData(String, String, int, String)", "계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
+        self.plus_price_rate_loop.exec_()
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
@@ -168,7 +187,23 @@ class Kiwoom:
 
             ok_deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "출금가능금액")
             print("출금가능금액 %s" % int(ok_deposit))
+
+            buy_deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,
+                                               "주문가능금액")
+            print("주문가능금액 %s" % int(buy_deposit))
             self.detail_account_info_event_loop.exit()
+
+        elif sRQName == "계좌평가잔고내역요청":
+            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,
+                                                   "총매입금액")
+            print("총매입금액 %s" % int(total_buy_money))
+
+            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName,
+                                                          0,
+                                                          "총수익률(%)")
+            print("총수익률 %s" % float(total_profit_loss_rate))
+
+            self.plus_price_rate_loop.exit()
 
     def changed_trading_type(self, name):
         if (name == "지정가"):
