@@ -11,7 +11,6 @@ class MyWindow():
     def __init__(self):
         super().__init__()
         self.kiwoom = Kiwoom()
-        self.kiwoom.comm_connect()
 
         while True:
             n = int(input("메뉴번호를 선택하세요 : "))

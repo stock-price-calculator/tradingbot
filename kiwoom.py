@@ -1,3 +1,7 @@
+import os
+import sys
+from idlelib.iomenu import errors
+
 import pythoncom
 from PyQt5.QtCore import QEventLoop
 
@@ -7,27 +11,38 @@ from PyQt5.QAxContainer import *
 
 class Kiwoom:
     def __init__(self):
-        self.login = False
-        self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
-        self.ocx.OnEventConnect.connect(self.on_event_connect)
-        self.ocx.OnReceiveTrData.connect(self.trdata_slot)
+
+        self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
+
+        self.create_kiwoom_instance()
+        self.set_event_collection()
+        self.connect_login()
 
         self.detail_account_info_event_loop = None
 
+    # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
+    def create_kiwoom_instance(self):
+        self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
+
+    # 이벤트 요청 연결
+    def set_event_collection(self):
+        self.ocx.OnEventConnect.connect(self.login_slot)
+        self.ocx.OnReceiveTrData.connect(self.trdata_slot)
 
     # 로그인 메서드 호출
-    def comm_connect(self):
+    def connect_login(self):
         self.ocx.dynamicCall("CommConnect()")
-        while not self.login:
-            pythoncom.PumpWaitingMessages()
+        self.login_event_loop.exec_()
 
     # 로그인 성공 여부
-    def on_event_connect(self, err_code):
+    def login_slot(self, err_code):
         if err_code == 0:
-            print("로그인 성공")
-            self.login = True
+            print("로그인에 성공하였습니다.")
         else:
-            print("로그인 실패")
+            print("로그인에 실패하였습니다.")
+            sys.exit(0)
+        self.login_event_loop.exit()
+
 
     # 종목코드의 종목명을 반환
     def get_master_code_name(self, code):
@@ -54,7 +69,6 @@ class Kiwoom:
     def get_master_last_price(self, code):
         result = self.ocx.dynamicCall("GetMasterLastPrice(QString)", code)
         return result
-
 
     # SendOrder 호출
     def send_buy_order(self, account, item_code, quantity, price, trading_type):
@@ -135,11 +149,12 @@ class Kiwoom:
         self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", "00")
         self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", "2")
         self.ocx.dynamicCall("CommRqData(QString,QString,int,QString)", "예수금상세현황요청", "opw00001", 0, "2000")
-        #self.detail_account_info_event_loop = QEventLoop()
-        #self.detail_account_info_event_loop.exec_()
+        # self.detail_account_info_event_loop = QEventLoop()
+        # self.detail_account_info_event_loop.exec_()
 
     def event_slots(self):
         self.OnEventConnect.connect(self.login_slot)
+
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
         '''
@@ -159,7 +174,8 @@ class Kiwoom:
 
             ok_deposit = self.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "출금가능금액")
             print("출금가능금액 %s" % int(ok_deposit))
-            #self.detail_account_info_event_loop.exit()
+            # self.detail_account_info_event_loop.exit()
+
     def changed_trading_type(self, name):
         if (name == "지정가"):
             return constants.LIMIT_PRICE_VALUE
@@ -181,6 +197,3 @@ class Kiwoom:
             return constants.CHANGE_SELL
         else:
             return constants.ERROR_CODE
-
-
-
