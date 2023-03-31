@@ -2,7 +2,6 @@ import os
 import sys
 from idlelib.iomenu import errors
 
-import pythoncom
 from PyQt5.QtCore import QEventLoop
 
 import constants
@@ -13,12 +12,11 @@ class Kiwoom:
     def __init__(self):
 
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
+        self.detail_account_info_event_loop = QEventLoop() # 예수금 담담 이벤트 루프
 
         self.create_kiwoom_instance()
         self.set_event_collection()
         self.connect_login()
-
-        self.detail_account_info_event_loop = None
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
@@ -142,18 +140,14 @@ class Kiwoom:
                                       list(order_params.values()), )
         return result
 
-    def get_detail_account_info(self, deposit_name, pw, pw_mc, search5):
+    def get_detail_account_info(self, account, password, pw_mc, division_number):
         print("계좌번호 및 비밀번호 등을 입력/서버에 요청")
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "계좌번호", "8043137211")
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호", "0000")
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", "00")
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", "2")
+        self.ocx.dynamicCall("SetInputValue(QString,QString)", "계좌번호", account)
+        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호", password)
+        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", pw_mc)
+        self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", division_number)
         self.ocx.dynamicCall("CommRqData(QString,QString,int,QString)", "예수금상세현황요청", "opw00001", 0, "2000")
-        # self.detail_account_info_event_loop = QEventLoop()
-        # self.detail_account_info_event_loop.exec_()
-
-    def event_slots(self):
-        self.OnEventConnect.connect(self.login_slot)
+        self.detail_account_info_event_loop.exec_()
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
@@ -169,12 +163,12 @@ class Kiwoom:
 
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
-            deposit = self.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "예수금")
+            deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "예수금")
             print("예수금 %s" % int(deposit))
 
-            ok_deposit = self.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "출금가능금액")
+            ok_deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "출금가능금액")
             print("출금가능금액 %s" % int(ok_deposit))
-            # self.detail_account_info_event_loop.exit()
+            self.detail_account_info_event_loop.exit()
 
     def changed_trading_type(self, name):
         if (name == "지정가"):

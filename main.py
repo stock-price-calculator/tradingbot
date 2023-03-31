@@ -1,6 +1,5 @@
 import sys
 
-import pythoncom
 from PyQt5.QAxContainer import *
 from PyQt5.QtCore import QEventLoop
 from PyQt5.QtWidgets import *
@@ -23,7 +22,7 @@ class MyWindow():
             elif n == 3:
                 self.start_test()
             elif n == 4:
-                result = self.kiwoom.get_detail_account_info("8043137211","0000","00",2)
+                result = self.kiwoom.get_detail_account_info("8043137211","0000","00","2")
                 print(result)
 
 
