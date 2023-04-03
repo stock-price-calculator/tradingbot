@@ -12,6 +12,7 @@ from PyQt5.QAxContainer import *
 class Kiwoom:
     def __init__(self):
 
+        self.trading_record_loop = None
         self.plus_price_rate_loop = None
         self.detail_account_info_event_loop = None
         self.login_event_loop = None
@@ -169,6 +170,40 @@ class Kiwoom:
         self.ocx.dynamicCall("CommRqData(String, String, int, String)", "계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
         self.plus_price_rate_loop.exec_()
 
+    # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
+    def get_trading_record_date(self, term):
+        result_date = []
+        current_date = datetime.date.today()
+
+        for i in range(0, term):
+            original_date = current_date - datetime.timedelta(days=i)
+            splits = str(original_date).split("-")
+            conversion_date = splits[0] + splits[1] + splits[2]
+            weekend_date = datetime.date(int(splits[0]), int(splits[1]), int(splits[2])).weekday()
+            if weekend_date > 4:
+                pass
+            else:
+                result_date.append(conversion_date)
+        return result_date
+
+    # 체결내역
+    def get_trading_record(self, all_date, account, find_division, buy_or_sell, item_code=""):
+        print("체결내역 서버에 요청")
+
+        for day in reversed(all_date):
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "주문일자", day)
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "계좌번호", account)
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호", "0000")
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", "00")
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", find_division)
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "주식채권구분", "1")
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "매도수구분", buy_or_sell)
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "종목코드", item_code)
+            self.ocx.dynamicCall("SetInputValue(QString,QString)", "시작주문번호", "")
+            self.ocx.dynamicCall("CommRqData(QString,QString,int,QString)", "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
+            self.trading_record_loop = QEventLoop()
+            self.trading_record_loop.exec_()
+
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
         '''
@@ -184,27 +219,31 @@ class Kiwoom:
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
             deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "예수금")
-            print("예수금 %s" % int(deposit))
-
             ok_deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "출금가능금액")
-            print("출금가능금액 %s" % int(ok_deposit))
-
             buy_deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,
                                                "주문가능금액")
+            print("출금가능금액 %s" % int(ok_deposit))
+            print("예수금 %s" % int(deposit))
             print("주문가능금액 %s" % int(buy_deposit))
+
             self.detail_account_info_event_loop.exit()
 
+        # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
-            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,
-                                                   "총매입금액")
+            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,"총매입금액")
+            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName,0,"총수익률(%)")
             print("총매입금액 %s" % int(total_buy_money))
-
-            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName,
-                                                          0,
-                                                          "총수익률(%)")
             print("총수익률 %s" % float(total_profit_loss_rate))
 
             self.plus_price_rate_loop.exit()
+
+        elif sRQName == "계좌별주문체결내역상세요청":
+            repeat = self.ocx.dynamicCall("GetRepeatCnt(QString, QString)", sTrCode, sRecordName)
+
+            for i in range(repeat):
+                item_code =self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"종목번호")
+
+
 
     def changed_trading_type(self, name):
         if (name == "지정가"):
@@ -227,19 +266,3 @@ class Kiwoom:
             return constants.CHANGE_SELL
         else:
             return constants.ERROR_CODE
-
-    # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
-    def get_trading_record(self,term):
-        result_date = []
-        current_date = datetime.date.today()
-
-        for i in range(0, term):
-            original_date = current_date - datetime.timedelta(days=i)
-            splits = str(original_date).split("-")
-            conversion_date = splits[0] + splits[1] + splits[2]
-            weekend_date = datetime.date(int(splits[0]), int(splits[1]), int(splits[2])).weekday()
-            if weekend_date > 4:
-                pass
-            else:
-                result_date.append(conversion_date)
-        return result_date

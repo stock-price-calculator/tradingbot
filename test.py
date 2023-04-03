@@ -20,6 +20,6 @@ def cal_day_data(term):
 
     return thelatest_date
 
-cal_day_data(10)
+
 
 
