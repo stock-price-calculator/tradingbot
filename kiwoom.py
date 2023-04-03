@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime
 from idlelib.iomenu import errors
 
 from PyQt5.QtCore import QEventLoop
@@ -226,3 +227,19 @@ class Kiwoom:
             return constants.CHANGE_SELL
         else:
             return constants.ERROR_CODE
+
+    # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
+    def get_trading_record(self,term):
+        result_date = []
+        current_date = datetime.date.today()
+
+        for i in range(0, term):
+            original_date = current_date - datetime.timedelta(days=i)
+            splits = str(original_date).split("-")
+            conversion_date = splits[0] + splits[1] + splits[2]
+            weekend_date = datetime.date(int(splits[0]), int(splits[1]), int(splits[2])).weekday()
+            if weekend_date > 4:
+                pass
+            else:
+                result_date.append(conversion_date)
+        return result_date
