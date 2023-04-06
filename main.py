@@ -25,7 +25,8 @@ class MyWindow():
                 self.kiwoom.get_detail_account_info("8043137211")
             elif n == 5: #총수익률
                 self.kiwoom.get_detail_account_mystock("8043137211")
-
+            elif n == 6: # 계좌별주문체결내역상세요청
+                self.kiwoom.get_trading_record(10, "8043137211", "1", "0", "")
 
     def start_test(self):
         # tr 요청

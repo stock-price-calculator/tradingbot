@@ -1,6 +1,7 @@
 import os
 import sys
 import datetime
+import time
 from idlelib.iomenu import errors
 
 from PyQt5.QtCore import QEventLoop
@@ -36,6 +37,7 @@ class Kiwoom:
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
         self.detail_account_info_event_loop = QEventLoop()  # 예수금상세현황요청 담담 이벤트 루프
         self.plus_price_rate_loop = QEventLoop()  # 계좌평가잔고 루프
+        self.trading_record_loop = QEventLoop()  # 체결내역 루프
 
     # 로그인 메서드 호출
     def connect_login(self):
@@ -152,21 +154,22 @@ class Kiwoom:
     # 예수금상세현황요청
     def get_detail_account_info(self, account):
         print("계좌번호 및 비밀번호 등을 입력/서버에 요청")
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "계좌번호", account)
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호", "0000")
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", "00")
-        self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", "2")
-        self.ocx.dynamicCall("CommRqData(QString,QString,int,QString)", "예수금상세현황요청", "opw00001", 0, "2000")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", account)
+        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", "2")
+        self.ocx.dynamicCall("CommRqData(String,String,int,String)", "예수금상세현황요청", "opw00001", 0, "2000")
         self.detail_account_info_event_loop.exec_()
 
     # 계좌평가잔고내역요청
     def get_detail_account_mystock(self, account, sPrevNext="0"):
+        print("계좌평가잔고내역 서버에 요청")
         # 계좌평가 잔고내역 요청
         # sPrevNext="0" : 싱글데이터 받아오기(종목합계 데이터)
-        self.ocx.dynamicCall("SetInputValue(String, String)", "계좌번호", account)
-        self.ocx.dynamicCall("SetInputValue(String, String)", "비밀번호", "0000")
-        self.ocx.dynamicCall("SetInputValue(String, String)", "비밀번호입력매체구분", "00")
-        self.ocx.dynamicCall("SetInputValue(String, String)", "조회구분", "2")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", account)
+        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", "2")
         self.ocx.dynamicCall("CommRqData(String, String, int, String)", "계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
         self.plus_price_rate_loop.exec_()
 
@@ -187,22 +190,27 @@ class Kiwoom:
         return result_date
 
     # 체결내역
-    def get_trading_record(self, all_date, account, find_division, buy_or_sell, item_code=""):
+    def get_trading_record(self, term, account, find_division, buy_or_sell, item_code=""):
         print("체결내역 서버에 요청")
 
+        # term기간만큼 이전날짜 가져옴
+        all_date = self.get_trading_record_date(term)
+
         for day in reversed(all_date):
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "주문일자", day)
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "계좌번호", account)
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호", "0000")
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "비밀번호입력매체구분", "00")
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "조회구분", find_division)
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "주식채권구분", "1")
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "매도수구분", buy_or_sell)
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "종목코드", item_code)
-            self.ocx.dynamicCall("SetInputValue(QString,QString)", "시작주문번호", "")
-            self.ocx.dynamicCall("CommRqData(QString,QString,int,QString)", "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
-            self.trading_record_loop = QEventLoop()
+            print(day)
+            self.ocx.dynamicCall("SetInputValue(String,String)", "주문일자", day)
+            self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", account)
+            self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", find_division)
+            self.ocx.dynamicCall("SetInputValue(String,String)", "주식채권구분", "1")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "매도수구분", buy_or_sell)
+            self.ocx.dynamicCall("SetInputValue(String,String)", "종목코드", item_code)
+            self.ocx.dynamicCall("SetInputValue(String,String)", "시작주문번호", "")
+            self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌별주문체결내역상세요청", "opw00007", 2, "2000")
+            print("긑"+ day)
             self.trading_record_loop.exec_()
+
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
@@ -230,20 +238,30 @@ class Kiwoom:
 
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
-            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,"총매입금액")
-            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName,0,"총수익률(%)")
+
+            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "총매입금액")
+            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "총수익률(%)")
+
             print("총매입금액 %s" % int(total_buy_money))
             print("총수익률 %s" % float(total_profit_loss_rate))
 
             self.plus_price_rate_loop.exit()
 
+        # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
-            repeat = self.ocx.dynamicCall("GetRepeatCnt(QString, QString)", sTrCode, sRecordName)
-
+            repeat = self.ocx.dynamicCall("GetRepeatCnt(String, String)", sTrCode, sRQName)
+            print("총개수 : " + repeat)
             for i in range(repeat):
-                item_code =self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"종목번호")
+                item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"종목번호")
+                trade_count = int(self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"체결수량"))
+                trade_price = int(self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"체결단가"))
+                order_gubun = int(self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"주문구분"))
 
-
+                print("종목번호 %s" % item_code)
+                print("체결수량 %s" % int(trade_count))
+                print("체결단가 %s" % int(trade_price))
+                print("주문구분 %s" % int(order_gubun))
+            self.trading_record_loop.exit()
 
     def changed_trading_type(self, name):
         if (name == "지정가"):
