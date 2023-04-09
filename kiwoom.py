@@ -2,6 +2,7 @@ import os
 import sys
 import datetime
 import time
+import traceback
 from idlelib.iomenu import errors
 
 from PyQt5.QtCore import QEventLoop
@@ -206,12 +207,26 @@ class Kiwoom:
             self.ocx.dynamicCall("SetInputValue(String,String)", "매도수구분", buy_or_sell)
             self.ocx.dynamicCall("SetInputValue(String,String)", "종목코드", item_code)
             self.ocx.dynamicCall("SetInputValue(String,String)", "시작주문번호", "")
-            self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
+            self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌별주문체결내역상세요청", "opw00007", 1, "2000")
             self.trading_record_loop = QEventLoop()  # 체결내역 루프
             self.trading_record_loop.exec_()
             print(day)
             time.sleep(0.3)
 
+    def get_trading_record_test(self):
+        print("체결내역 서버에 요청")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "주문일자", "20230331")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", "8043137211")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", "1")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "주식채권구분", "1")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "매도수구분", "0")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "종목코드", "")
+        self.ocx.dynamicCall("SetInputValue(String,String)", "시작주문번호", "")
+        self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌테스트", "opw00007", 0, "2000")
+        self.trading_record_loop = QEventLoop()  # 체결내역 루프
+        self.trading_record_loop.exec_()
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
@@ -258,23 +273,56 @@ class Kiwoom:
 
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
-            item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
-                                             "종목번호")
-            item_name = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0, "종목명")
-            trade_count = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
-                                               "체결수량")
-            trade_price = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
-                                               "체결단가")
-            order_type = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
-                                              "매매구분")
+
+            repeat = self.ocx.dynamicCall("GetRepeatCnt(String, String)", sTrCode, sRQName)
+
+            if repeat == 0:
+                repeat = 1
+
+            for i in range(repeat):
+                order_number = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "주문번호")
+                item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "종목번호")
+                item_name = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "종목명")
+                trade_count = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "체결수량")
+                trade_price = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "체결단가")
+                order_type = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "매매구분")
 
             print("--------------------------")
-            print("종목번호 %s" % item_code)
-            print("종목명 %s" % item_name)
-            print("체결수량 %s" % (trade_count))
-            print("체결단가 %s" % (trade_price))
-            print("매매구분 %s" % (order_type))
+            print("총개수 : " + repeat)
+            print("주문번호 :  %s" % order_number)
+            print("종목번호 : %s" % item_code)
+            print("종목명   : %s" % item_name)
+            print("체결수량 : %s" % (trade_count))
+            print("체결단가 : %s" % (trade_price))
+            print("매매구분 : %s" % (order_type))
             print("--------------------------")
+            self.trading_record_loop.exit()
+
+        elif sRQName == "계좌테스트":
+
+            repeat = self.ocx.dynamicCall("GetRepeatCnt(String, String)", sTrCode, sRQName)
+            print("반복 : %s" % repeat)
+
+            for i in range(repeat):
+                print(i)
+                order_number = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                                "주문번호")
+                item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                             "종목번호")
+                item_name = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "종목명")
+                trade_count = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                               "체결수량")
+                trade_price = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                               "체결단가")
+                order_type = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                              "매매구분")
+
+                print("주문번호 :  %s" % order_number)
+                print("종목번호 : %s" % item_code)
+                print("종목명   : %s" % item_name)
+                print("체결수량 : %s" % (trade_count))
+                print("체결단가 : %s" % (trade_price))
+                print("매매구분 : %s" % (order_type))
 
             self.trading_record_loop.exit()
 
