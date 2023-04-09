@@ -37,7 +37,7 @@ class Kiwoom:
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
         self.detail_account_info_event_loop = QEventLoop()  # 예수금상세현황요청 담담 이벤트 루프
         self.plus_price_rate_loop = QEventLoop()  # 계좌평가잔고 루프
-        self.trading_record_loop = QEventLoop()  # 체결내역 루프
+
 
     # 로그인 메서드 호출
     def connect_login(self):
@@ -197,7 +197,6 @@ class Kiwoom:
         all_date = self.get_trading_record_date(term)
 
         for day in reversed(all_date):
-            print(day)
             self.ocx.dynamicCall("SetInputValue(String,String)", "주문일자", day)
             self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", account)
             self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
@@ -207,9 +206,11 @@ class Kiwoom:
             self.ocx.dynamicCall("SetInputValue(String,String)", "매도수구분", buy_or_sell)
             self.ocx.dynamicCall("SetInputValue(String,String)", "종목코드", item_code)
             self.ocx.dynamicCall("SetInputValue(String,String)", "시작주문번호", "")
-            self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌별주문체결내역상세요청", "opw00007", 2, "2000")
-            print("긑"+ day)
+            self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
+            self.trading_record_loop = QEventLoop()  # 체결내역 루프
             self.trading_record_loop.exec_()
+            print(day)
+            time.sleep(0.3)
 
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
@@ -223,6 +224,14 @@ class Kiwoom:
         :param sPrevNext: 다음 페이지가 있는지
         :return:
         '''
+
+        # print("--------------------")
+        # print(sScrNo)
+        # print(sRQName)
+        # print(sTrCode)
+        # print(sRecordName)
+        # print(sPrevNext)
+        # print("--------------------")
 
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
@@ -249,18 +258,24 @@ class Kiwoom:
 
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
-            repeat = self.ocx.dynamicCall("GetRepeatCnt(String, String)", sTrCode, sRQName)
-            print("총개수 : " + repeat)
-            for i in range(repeat):
-                item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"종목번호")
-                trade_count = int(self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"체결수량"))
-                trade_price = int(self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"체결단가"))
-                order_gubun = int(self.ocx.dynamicCall("GetCommData(String, String, int, String)",sTrCode,sRecordName,i,"주문구분"))
+            item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
+                                             "종목번호")
+            item_name = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0, "종목명")
+            trade_count = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
+                                               "체결수량")
+            trade_price = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
+                                               "체결단가")
+            order_type = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, 0,
+                                              "매매구분")
 
-                print("종목번호 %s" % item_code)
-                print("체결수량 %s" % int(trade_count))
-                print("체결단가 %s" % int(trade_price))
-                print("주문구분 %s" % int(order_gubun))
+            print("--------------------------")
+            print("종목번호 %s" % item_code)
+            print("종목명 %s" % item_name)
+            print("체결수량 %s" % (trade_count))
+            print("체결단가 %s" % (trade_price))
+            print("매매구분 %s" % (order_type))
+            print("--------------------------")
+
             self.trading_record_loop.exit()
 
     def changed_trading_type(self, name):
