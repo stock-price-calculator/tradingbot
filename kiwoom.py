@@ -215,18 +215,38 @@ class Kiwoom:
 
     def get_trading_record_test(self):
         print("체결내역 서버에 요청")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "주문일자", "20230331")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", "8043137211")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", "1")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "주식채권구분", "1")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "매도수구분", "0")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "종목코드", "")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "시작주문번호", "")
-        self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌테스트", "opw00007", 0, "2000")
-        self.trading_record_loop = QEventLoop()  # 체결내역 루프
-        self.trading_record_loop.exec_()
+
+        all_date = self.get_trading_record_date(15)
+
+        print(all_date)
+        for day in reversed(all_date):
+            self.ocx.dynamicCall("SetInputValue(String,String)", "주문일자", day)
+            self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", "8043137211")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", "1")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "주식채권구분", "1")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "매도수구분", "0")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "종목코드", "")
+            self.ocx.dynamicCall("SetInputValue(String,String)", "시작주문번호", "")
+            self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌테스트", "opw00007", 0, "2000")
+            self.trading_record_loop = QEventLoop()  # 체결내역 루프
+            self.trading_record_loop.exec_()
+            time.sleep(0.3)
+
+
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "주문일자", "20230331")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", "8043137211")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", "1")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "주식채권구분", "1")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "매도수구분", "0")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "종목코드", "")
+        # self.ocx.dynamicCall("SetInputValue(String,String)", "시작주문번호", "")
+        # self.ocx.dynamicCall("CommRqData(String,String,int,String)", "계좌테스트", "opw00007", 0, "2000")
+        # self.trading_record_loop = QEventLoop()  # 체결내역 루프
+        # self.trading_record_loop.exec_()
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
@@ -302,6 +322,9 @@ class Kiwoom:
 
             repeat = self.ocx.dynamicCall("GetRepeatCnt(String, String)", sTrCode, sRQName)
             print("반복 : %s" % repeat)
+
+            if repeat == 0:
+                repeat = 1
 
             for i in range(repeat):
                 print(i)
