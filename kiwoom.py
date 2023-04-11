@@ -11,6 +11,29 @@ import constants
 from PyQt5.QAxContainer import *
 
 
+def changed_trading_type(name):
+    if (name == "지정가"):
+        return constants.LIMIT_PRICE_VALUE
+    else:
+        return constants.MARKET_PRICE_VALUE
+
+def change_order_type(name):
+    if (name == "신규매수"):
+        return constants.NEW_BUY
+    elif (name == "신규매도"):
+        return constants.NEW_SELL
+    elif (name == "매수취소"):
+        return constants.CANCEL_BUY
+    elif (name == "매도취소"):
+        return constants.CANCEL_SELL
+    elif (name == "매수정정"):
+        return constants.CHANGE_BUY
+    elif (name == "매도정정"):
+        return constants.CHANGE_SELL
+    else:
+        return constants.ERROR_CODE
+
+
 class Kiwoom:
     def __init__(self):
 
@@ -33,8 +56,6 @@ class Kiwoom:
 
     def create_loop_event(self):
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
-
-
 
     # 로그인 메서드 호출
     def connect_login(self):
@@ -87,7 +108,7 @@ class Kiwoom:
             "code": item_code,
             "stock_quantity": quantity,
             "price": price,
-            "trading_type": self.changed_trading_type(trading_type),
+            "trading_type": changed_trading_type(trading_type),
             "origin_order_number": '',
         }
         result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
@@ -105,7 +126,7 @@ class Kiwoom:
             "code": item_code,
             "stock_quantity": quantity,
             "price": price,
-            "trading_type": self.changed_trading_type(trading_type),
+            "trading_type": changed_trading_type(trading_type),
             "origin_order_number": '',
         }
         result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
@@ -123,7 +144,7 @@ class Kiwoom:
             "code": item_code,
             "stock_quantity": quantity,
             "price": price,
-            "trading_type": self.changed_trading_type(trading_type),
+            "trading_type": changed_trading_type(trading_type),
             "origin_order_number": original_order_num,
         }
         result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
@@ -140,7 +161,7 @@ class Kiwoom:
             "code": item_code,
             "stock_quantity": quantity,
             "price": price,
-            "trading_type": self.changed_trading_type(trading_type),
+            "trading_type": changed_trading_type(trading_type),
             "origin_order_number": original_order_num,
         }
 
@@ -153,8 +174,8 @@ class Kiwoom:
         self.set_input_value("계좌번호", account)
         self.set_input_value("비밀번호", "0000")
         self.set_input_value("비밀번호입력매체구분", "00")
-        self.set_input_value( "조회구분", "2")
-        self.comm_rq_data("예수금상세현황요청", "opw00001", 0, "2000")
+        self.set_input_value("조회구분", "2")
+        self.send_comm_rq_data("예수금상세현황요청", "opw00001", 0, "2000")
 
     # 계좌평가잔고내역요청
     def get_detail_account_mystock(self, account, sPrevNext="0"):
@@ -164,7 +185,7 @@ class Kiwoom:
         self.set_input_value("비밀번호", "0000")
         self.set_input_value("비밀번호입력매체구분", "00")
         self.set_input_value("조회구분", "2")
-        self.comm_rq_data("계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
+        self.sned_comm_rq_data("계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
 
     # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
     def get_trading_record_date(self, term):
@@ -200,9 +221,8 @@ class Kiwoom:
             self.set_input_value("매도수구분", buy_or_sell)
             self.set_input_value("종목코드", item_code)
             self.set_input_value("시작주문번호", "")
-            self.comm_rq_data("계좌별주문체결내역상세요청", "opw00007", 0, "2000")
+            self.send_comm_rq_data("계좌별주문체결내역상세요청", "opw00007", 0, "2000")
             time.sleep(0.3)
-
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
@@ -240,8 +260,10 @@ class Kiwoom:
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
 
-            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "총매입금액")
-            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "총수익률(%)")
+            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,
+                                                   "총매입금액")
+            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName,
+                                                          0, "총수익률(%)")
 
             print("총매입금액 %s" % int(total_buy_money))
             print("총수익률 %s" % float(total_profit_loss_rate))
@@ -257,12 +279,18 @@ class Kiwoom:
                 repeat = 1
 
             for i in range(repeat):
-                order_number = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "주문번호")
-                item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "종목번호")
-                item_name = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "종목명")
-                trade_count = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "체결수량")
-                trade_price = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "체결단가")
-                order_type = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i, "매매구분")
+                order_number = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                                    "주문번호")
+                item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                                 "종목번호")
+                item_name = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                                 "종목명")
+                trade_count = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                                   "체결수량")
+                trade_price = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                                   "체결단가")
+                order_type = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
+                                                  "매매구분")
 
                 if order_number != "":
                     print("--------------------------")
@@ -275,35 +303,18 @@ class Kiwoom:
                     print("--------------------------")
             self.tr_event_loop.exit()
 
-
-     # tr요청 기본 함수
+    # tr요청 기본 함수
+    # tr 데이터 정보 입력
     def set_input_value(self, id, value):
         self.ocx.dynamicCall("SetInputValue(String, String)", id, value)
 
-    def comm_rq_data(self, rqname, trcode, next, screen_no):
-        self.ocx.dynamicCall("CommRqData(String,String,int,String)", rqname, trcode, next, screen_no)
+    # tr데이터 전송
+    def send_comm_rq_data(self, rqname, trcode, next, screen_number):
+        self.ocx.dynamicCall("CommRqData(String,String,int,String)", rqname, trcode, next, screen_number)
         self.tr_event_loop = QEventLoop()
         self.tr_event_loop.exec_()
 
-
-    def changed_trading_type(self, name):
-        if (name == "지정가"):
-            return constants.LIMIT_PRICE_VALUE
-        else:
-            return constants.MARKET_PRICE_VALUE
-
-    def change_order_type(self, name):
-        if (name == "신규매수"):
-            return constants.NEW_BUY
-        elif (name == "신규매도"):
-            return constants.NEW_SELL
-        elif (name == "매수취소"):
-            return constants.CANCEL_BUY
-        elif (name == "매도취소"):
-            return constants.CANCEL_SELL
-        elif (name == "매수정정"):
-            return constants.CHANGE_BUY
-        elif (name == "매도정정"):
-            return constants.CHANGE_SELL
-        else:
-            return constants.ERROR_CODE
+    # tr 반복수 받음
+    def get_repeat_cnt(self, trcode, rqname):
+        result = self.ocx.dynamicCall("GetRepeatCnt(String, String)", trcode, rqname)
+        return result
