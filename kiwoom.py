@@ -166,7 +166,7 @@ class Kiwoom:
         }
 
         result = self.send_trading_data(order_params)
-        
+
         return result
 
     # 예수금상세현황요청
@@ -246,24 +246,21 @@ class Kiwoom:
 
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
-            deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "예수금")
-            ok_deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0, "출금가능금액")
-            buy_deposit = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,
-                                               "주문가능금액")
+
+            deposit = self.get_comm_data(sTrCode, sRQName, 0, "예수금")
+            ok_deposit = self.get_comm_data(sTrCode, sRQName, 0, "출금가능금액")
+            buy_deposit = self.get_comm_data( sTrCode, sRQName, 0, "주문가능금액")
             print("출금가능금액 %s" % int(ok_deposit))
             print("예수금 %s" % int(deposit))
             print("주문가능금액 %s" % int(buy_deposit))
-
             self.tr_event_loop.exit()
 
 
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
 
-            total_buy_money = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName, 0,
-                                                   "총매입금액")
-            total_profit_loss_rate = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRQName,
-                                                          0, "총수익률(%)")
+            total_buy_money = self.get_comm_data( sTrCode, sRQName, 0, "총매입금액")
+            total_profit_loss_rate = self.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)")
 
             print("총매입금액 %s" % int(total_buy_money))
             print("총수익률 %s" % float(total_profit_loss_rate))
@@ -279,18 +276,12 @@ class Kiwoom:
                 repeat = 1
 
             for i in range(repeat):
-                order_number = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
-                                                    "주문번호")
-                item_code = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
-                                                 "종목번호")
-                item_name = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
-                                                 "종목명")
-                trade_count = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
-                                                   "체결수량")
-                trade_price = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
-                                                   "체결단가")
-                order_type = self.ocx.dynamicCall("GetCommData(String, String, int, String)", sTrCode, sRecordName, i,
-                                                  "매매구분")
+                order_number = self.get_comm_data(sTrCode, sRecordName, i, "주문번호")
+                item_code = self.get_comm_data(sTrCode, sRecordName, i, "종목번호")
+                item_name = self.get_comm_data(sTrCode, sRecordName, i, "종목명")
+                trade_count = self.get_comm_data(sTrCode, sRecordName, i, "체결수량")
+                trade_price = self.get_comm_data(sTrCode, sRecordName, i, "체결단가")
+                order_type = self.get_comm_data( sTrCode, sRecordName, i, "매매구분")
 
                 if order_number != "":
                     print("--------------------------")
@@ -316,10 +307,17 @@ class Kiwoom:
 
     # tr 반복수 받음
     def get_repeat_cnt(self, trcode, rqname):
-        result = self.ocx.dynamicCall("GetRepeatCnt(String, String)", trcode, rqname)
-        return result
+        repeat_cnt = self.ocx.dynamicCall("GetRepeatCnt(String, String)", trcode, rqname)
+        return repeat_cnt
 
+    # 매수 매도 데이터 전송
     def send_trading_data(self, order_params):
-        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+        trade_data = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
                                       list(order_params.values()), )
-        return result
+        return trade_data
+
+    def get_comm_data(self, trcode, record_name, next, rqname):
+        comm_data = self.ocx.dynamicCall("GetCommData(String, String, int, String)", trcode, record_name, next, rqname)
+        return comm_data
+
+
