@@ -111,8 +111,8 @@ class Kiwoom:
             "trading_type": changed_trading_type(trading_type),
             "origin_order_number": '',
         }
-        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                      list(order_params.values()), )
+        result = self.send_trading_data(order_params)
+
         return result
 
     # SendOrder 호출
@@ -129,8 +129,8 @@ class Kiwoom:
             "trading_type": changed_trading_type(trading_type),
             "origin_order_number": '',
         }
-        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                      list(order_params.values()), )
+        result = self.send_trading_data(order_params)
+
         return result
 
     # SendOrder 호출
@@ -147,8 +147,8 @@ class Kiwoom:
             "trading_type": changed_trading_type(trading_type),
             "origin_order_number": original_order_num,
         }
-        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                      list(order_params.values()), )
+        result = self.send_trading_data(order_params)
+
         return result
 
     # SendOrder 호출
@@ -165,8 +165,8 @@ class Kiwoom:
             "origin_order_number": original_order_num,
         }
 
-        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                      list(order_params.values()), )
+        result = self.send_trading_data(order_params)
+        
         return result
 
     # 예수금상세현황요청
@@ -317,4 +317,9 @@ class Kiwoom:
     # tr 반복수 받음
     def get_repeat_cnt(self, trcode, rqname):
         result = self.ocx.dynamicCall("GetRepeatCnt(String, String)", trcode, rqname)
+        return result
+
+    def send_trading_data(self, order_params):
+        result = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+                                      list(order_params.values()), )
         return result
