@@ -16,9 +16,10 @@ class Kiwoom:
 
         self.trading_record_loop = None
         self.plus_price_rate_loop = None
-        self.detail_account_info_event_loop = None
         self.login_event_loop = None
+        self.tr_event_loop = None
         self.ocx = None
+
 
         self.create_loop_event()
         self.create_kiwoom_instance()
@@ -36,7 +37,6 @@ class Kiwoom:
 
     def create_loop_event(self):
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
-        self.detail_account_info_event_loop = QEventLoop()  # 예수금상세현황요청 담담 이벤트 루프
         self.plus_price_rate_loop = QEventLoop()  # 계좌평가잔고 루프
 
 
@@ -154,13 +154,11 @@ class Kiwoom:
 
     # 예수금상세현황요청
     def get_detail_account_info(self, account):
-        print("계좌번호 및 비밀번호 등을 입력/서버에 요청")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "계좌번호", account)
-        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호", "0000")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "비밀번호입력매체구분", "00")
-        self.ocx.dynamicCall("SetInputValue(String,String)", "조회구분", "2")
-        self.ocx.dynamicCall("CommRqData(String,String,int,String)", "예수금상세현황요청", "opw00001", 0, "2000")
-        self.detail_account_info_event_loop.exec_()
+        self.set_input_value("계좌번호", account)
+        self.set_input_value("비밀번호", "0000")
+        self.set_input_value("비밀번호입력매체구분", "00")
+        self.set_input_value( "조회구분", "2")
+        self.comm_rq_data("예수금상세현황요청", "opw00001", 0, "2000")
 
     # 계좌평가잔고내역요청
     def get_detail_account_mystock(self, account, sPrevNext="0"):
@@ -244,7 +242,8 @@ class Kiwoom:
             print("예수금 %s" % int(deposit))
             print("주문가능금액 %s" % int(buy_deposit))
 
-            self.detail_account_info_event_loop.exit()
+            self.tr_event_loop.exit()
+
 
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
@@ -284,6 +283,15 @@ class Kiwoom:
                     print("--------------------------")
             self.trading_record_loop.exit()
 
+
+    # tr요청 기본 함수
+    def set_input_value(self, id, value):
+        self.ocx.dynamicCall("SetInputValue(String, String)", id, value)
+
+    def comm_rq_data(self, rqname, trcode, next, screen_no):
+        self.ocx.dynamicCall("CommRqData(String,String,int,String)", rqname, trcode, next, screen_no)
+        self.tr_event_loop = QEventLoop()
+        self.tr_event_loop.exec_()
 
     def changed_trading_type(self, name):
         if (name == "지정가"):
