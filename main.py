@@ -28,7 +28,9 @@ class MyWindow():
             elif n == 6: # 계좌별주문체결내역상세요청
                 self.kiwoom.get_trading_record(20, "8043137211", "1", "0", "")
             elif n == 7: # 주식분봉차트조회요청
-                self.kiwoom.get_minutes_data("005930", "5")
+                self.kiwoom.get_minutes_chart_data("005930", "5")
+            elif n == 8:  # 주식일봉차트조회요청
+                self.kiwoom.get_minutes_chart_data("005930", "20230413")
 
     def start_test(self):
         # tr 요청

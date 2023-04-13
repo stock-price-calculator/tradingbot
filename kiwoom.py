@@ -227,11 +227,17 @@ class Kiwoom:
             time.sleep(0.3)
 
     # 분봉차트 조회
-    def get_minutes_data(self, item_code, minute_type):
+    def get_minutes_chart_data(self, item_code, minute_type):
         self.set_input_value("종목코드", item_code)
         self.set_input_value("틱범위", minute_type)
         self.set_input_value("수정주가구분", "0")
         self.send_comm_rq_data("주식분봉차트조회요청", "opt10080", 0, "2000")
+
+    # 일봉차트 조회
+    def get_day_chart_data(self, item_code, start_date):
+        self.set_input_value("종목코드", item_code)
+        self.set_input_value("기준일자", start_date)
+        self.send_comm_rq_data("주식일봉차트조회요청", "opt10081", 0, "2000")
 
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
@@ -296,11 +302,28 @@ class Kiwoom:
                 open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
                 high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
                 low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
-                time = self.get_comm_data(sTrCode, sRecordName, i, "체결시간")
+                standard_minute = self.get_comm_data(sTrCode, sRecordName, i, "체결시간")
 
-                view.주식분봉차트조회요청(time, current_price, open_price, high_price, low_price, volume)
+                view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
             self.tr_event_loop.exit()
-        
+
+        elif sRQName == "주식일봉차트조회요청":
+            repeat = self.get_repeat_cnt(sTrCode, sRQName)
+
+            for i in range(repeat):
+                current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
+                volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
+                open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
+                high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
+                low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
+                standard_day = self.get_comm_data(sTrCode, sRecordName, i, "일자")
+
+                view.주식일봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
+            self.tr_event_loop.exit()
+
+
+
+
 
 
 
