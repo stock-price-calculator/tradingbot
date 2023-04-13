@@ -30,7 +30,9 @@ class MyWindow():
             elif n == 7: # 주식분봉차트조회요청
                 self.kiwoom.get_minutes_chart_data("005930", "5")
             elif n == 8:  # 주식일봉차트조회요청
-                self.kiwoom.get_minutes_chart_data("005930", "20230413")
+                self.kiwoom.get_day_chart_data("005930", "20230413")
+            elif n == 9: # 주식주봉차트조회요청
+                self.kiwoom.get_week_chart_data("005930","20160101","20230413")
 
     def start_test(self):
         # tr 요청
