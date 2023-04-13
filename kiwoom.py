@@ -2,6 +2,7 @@ import os
 import sys
 import datetime
 import time
+import view
 import traceback
 from idlelib.iomenu import errors
 
@@ -16,6 +17,7 @@ def changed_trading_type(name):
         return constants.LIMIT_PRICE_VALUE
     else:
         return constants.MARKET_PRICE_VALUE
+
 
 def change_order_type(name):
     if (name == "신규매수"):
@@ -185,7 +187,7 @@ class Kiwoom:
         self.set_input_value("비밀번호", "0000")
         self.set_input_value("비밀번호입력매체구분", "00")
         self.set_input_value("조회구분", "2")
-        self.sned_comm_rq_data("계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
+        self.send_comm_rq_data("계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
 
     # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
     def get_trading_record_date(self, term):
@@ -249,21 +251,19 @@ class Kiwoom:
 
             deposit = self.get_comm_data(sTrCode, sRQName, 0, "예수금")
             ok_deposit = self.get_comm_data(sTrCode, sRQName, 0, "출금가능금액")
-            buy_deposit = self.get_comm_data( sTrCode, sRQName, 0, "주문가능금액")
-            print("출금가능금액 %s" % int(ok_deposit))
-            print("예수금 %s" % int(deposit))
-            print("주문가능금액 %s" % int(buy_deposit))
+            buy_deposit = self.get_comm_data(sTrCode, sRQName, 0, "주문가능금액")
+
+            view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
             self.tr_event_loop.exit()
 
 
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
 
-            total_buy_money = self.get_comm_data( sTrCode, sRQName, 0, "총매입금액")
+            total_buy_money = self.get_comm_data(sTrCode, sRQName, 0, "총매입금액")
             total_profit_loss_rate = self.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)")
 
-            print("총매입금액 %s" % int(total_buy_money))
-            print("총수익률 %s" % float(total_profit_loss_rate))
+            view.계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate)
             self.tr_event_loop.exit()
 
 
@@ -281,17 +281,10 @@ class Kiwoom:
                 item_name = self.get_comm_data(sTrCode, sRecordName, i, "종목명")
                 trade_count = self.get_comm_data(sTrCode, sRecordName, i, "체결수량")
                 trade_price = self.get_comm_data(sTrCode, sRecordName, i, "체결단가")
-                order_type = self.get_comm_data( sTrCode, sRecordName, i, "매매구분")
+                order_type = self.get_comm_data(sTrCode, sRecordName, i, "매매구분")
 
                 if order_number != "":
-                    print("--------------------------")
-                    print("주문번호 :  %s" % order_number)
-                    print("종목번호 : %s" % item_code)
-                    print("종목명   : %s" % item_name)
-                    print("체결수량 : %s" % (trade_count))
-                    print("체결단가 : %s" % (trade_price))
-                    print("매매구분 : %s" % (order_type))
-                    print("--------------------------")
+                    view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_count, trade_price, order_type)
             self.tr_event_loop.exit()
 
     # tr요청 기본 함수
@@ -312,12 +305,11 @@ class Kiwoom:
 
     # 매수 매도 데이터 전송
     def send_trading_data(self, order_params):
-        trade_data = self.ocx.dynamicCall("SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
-                                      list(order_params.values()), )
+        trade_data = self.ocx.dynamicCall(
+            "SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
+            list(order_params.values()), )
         return trade_data
 
     def get_comm_data(self, trcode, record_name, next, rqname):
         comm_data = self.ocx.dynamicCall("GetCommData(String, String, int, String)", trcode, record_name, next, rqname)
         return comm_data
-
-
