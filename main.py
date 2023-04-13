@@ -38,7 +38,7 @@ class MyWindow():
         # tr 요청
         name = self.kiwoom.get_master_code_name(constants.SAMSUNG_CODE)
         connectState = self.kiwoom.get_connect_state()
-        lastPrice = self.kiwoom.get_master_last_p1rice(constants.SAMSUNG_CODE)
+        lastPrice = self.kiwoom.get_master_last_price(constants.SAMSUNG_CODE)
 
         print("연결상태 : %d" % connectState)
         print("유저정보")

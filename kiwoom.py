@@ -212,7 +212,6 @@ class Kiwoom:
         # term기간만큼 이전날짜 가져옴
         all_date = self.get_trading_record_date(term)
 
-        print(all_date)
         for day in reversed(all_date):
             self.set_input_value("주문일자", day)
             self.set_input_value("계좌번호", account)
@@ -248,8 +247,85 @@ class Kiwoom:
         self.set_input_value("수정주가구분", "0")
         self.send_comm_rq_data("주식주봉차트조회요청", "opt10082", 0, "2000")
 
+
+
+
+    # 수신하는 함수
+
+    #  예수금상세현황요청 값 받기
+    def receive_detail_account_info(self, sTrCode, sRQName):
+        deposit = self.get_comm_data(sTrCode, sRQName, 0, "예수금")
+        ok_deposit = self.get_comm_data(sTrCode, sRQName, 0, "출금가능금액")
+        buy_deposit = self.get_comm_data(sTrCode, sRQName, 0, "주문가능금액")
+        view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
+
+    # 계좌평가잔고내역요청 값 받기
+    def receive_detail_account_mystock(self, sTrCode, sRQName):
+        total_buy_money = self.get_comm_data(sTrCode, sRQName, 0, "총매입금액")
+        total_profit_loss_rate = self.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)")
+        view.계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate)
+
+    # 계좌별주문체결내역상세요청 값 받기
+    def receive_trading_record(self,sTrCode, sRQName, sRecordName):
+        repeat = self.get_repeat_cnt(sTrCode, sRQName)
+
+        for i in range(repeat):
+            order_number = self.get_comm_data(sTrCode, sRecordName, i, "주문번호")
+            item_code = self.get_comm_data(sTrCode, sRecordName, i, "종목번호")
+            item_name = self.get_comm_data(sTrCode, sRecordName, i, "종목명")
+            trade_count = self.get_comm_data(sTrCode, sRecordName, i, "체결수량")
+            trade_price = self.get_comm_data(sTrCode, sRecordName, i, "체결단가")
+            order_type = self.get_comm_data(sTrCode, sRecordName, i, "매매구분")
+
+            if order_number != "":
+                view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_count, trade_price, order_type)
+
+    # 분봉차트 값 받기
+    def receive_minutes_chart_data(self,sTrCode, sRQName, sRecordName):
+        repeat = self.get_repeat_cnt(sTrCode, sRQName)
+
+        for i in range(repeat):
+            current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
+            volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
+            open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
+            high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
+            low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
+            standard_minute = self.get_comm_data(sTrCode, sRecordName, i, "체결시간")
+
+            view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
+
+    # 일봉차트 값 받기
+    def receive_day_chart_data(self,sTrCode, sRQName, sRecordName):
+        repeat = self.get_repeat_cnt(sTrCode, sRQName)
+
+        for i in range(repeat):
+            current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
+            volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
+            open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
+            high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
+            low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
+            standard_day = self.get_comm_data(sTrCode, sRecordName, i, "일자")
+
+            view.주식일봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
+
+    # 주봉차트 값 받기
+    def receive_week_chart_data(self, sTrCode, sRQName, sRecordName):
+        repeat = self.get_repeat_cnt(sTrCode, sRQName)
+
+        for i in range(repeat):
+            current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
+            volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
+            open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
+            high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
+            low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
+            standard_day = self.get_comm_data(sTrCode, sRecordName, i, "일자")
+
+            view.주식주봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
+
+
+    # 요청한 tr값 수신
     def receive_trdata(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
-        # TR SLOT 만들기
+
         '''
         TR 요청을 받는 구역, slot임
         :param sScrNo: 스크린 번호
@@ -260,89 +336,25 @@ class Kiwoom:
         :return:
         '''
 
-        # print("--------------------")
-        # print(sScrNo)
-        # print(sRQName)
-        # print(sTrCode)
-        # print(sRecordName)
-        # print(sPrevNext)
-        # print("--------------------")
+        # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
 
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
-
-            deposit = self.get_comm_data(sTrCode, sRQName, 0, "예수금")
-            ok_deposit = self.get_comm_data(sTrCode, sRQName, 0, "출금가능금액")
-            buy_deposit = self.get_comm_data(sTrCode, sRQName, 0, "주문가능금액")
-            view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
-            self.tr_event_loop.exit()
-
+            self.receive_detail_account_info(sTrCode, sRQName)
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
-            total_buy_money = self.get_comm_data(sTrCode, sRQName, 0, "총매입금액")
-            total_profit_loss_rate = self.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)")
-            view.계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate)
-            self.tr_event_loop.exit()
-
+            self.receive_detail_account_mystock(sTrCode, sRQName)
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
-
-            repeat = self.get_repeat_cnt(sTrCode, sRQName)
-
-            for i in range(repeat):
-                order_number = self.get_comm_data(sTrCode, sRecordName, i, "주문번호")
-                item_code = self.get_comm_data(sTrCode, sRecordName, i, "종목번호")
-                item_name = self.get_comm_data(sTrCode, sRecordName, i, "종목명")
-                trade_count = self.get_comm_data(sTrCode, sRecordName, i, "체결수량")
-                trade_price = self.get_comm_data(sTrCode, sRecordName, i, "체결단가")
-                order_type = self.get_comm_data(sTrCode, sRecordName, i, "매매구분")
-
-                if order_number != "":
-                    view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_count, trade_price, order_type)
-            self.tr_event_loop.exit()
-
+            self.receive_trading_record(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
-
-            repeat = self.get_repeat_cnt(sTrCode, sRQName)
-
-            for i in range(repeat):
-                current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
-                volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
-                open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
-                high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
-                low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
-                standard_minute = self.get_comm_data(sTrCode, sRecordName, i, "체결시간")
-
-                view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
-            self.tr_event_loop.exit()
-
+            self.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식일봉차트조회요청":
-            repeat = self.get_repeat_cnt(sTrCode, sRQName)
-
-            for i in range(repeat):
-                current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
-                volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
-                open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
-                high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
-                low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
-                standard_day = self.get_comm_data(sTrCode, sRecordName, i, "일자")
-
-                view.주식일봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
-            self.tr_event_loop.exit()
-
+            self.receive_day_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식주봉차트조회요청":
-            repeat = self.get_repeat_cnt(sTrCode, sRQName)
+            self.receive_week_chart_data(sTrCode, sRQName, sRecordName)
 
-            for i in range(repeat):
-                current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
-                volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
-                open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
-                high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
-                low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
-                standard_day = self.get_comm_data(sTrCode, sRecordName, i, "일자")
-
-                view.주식주봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
-            self.tr_event_loop.exit()
+        self.tr_event_loop.exit()
 
 
 

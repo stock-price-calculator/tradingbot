@@ -52,3 +52,13 @@ def 주식주봉차트조회요청(standard_day, current_price, open_price, high
     print("저가 : %s" % low_price)
     print("거래량 : %s" % volume)
     print("--------------------------")
+
+# receive_trdata 인자값들 출력
+def print_receive_trdata_element(sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
+    print(sScrNo)
+    print(sRQName)
+    print(sTrCode)
+    print(sRecordName)
+    print(sPrevNext)
+
+
