@@ -27,6 +27,8 @@ class MyWindow():
                 self.kiwoom.get_detail_account_mystock("8043137211")
             elif n == 6: # 계좌별주문체결내역상세요청
                 self.kiwoom.get_trading_record(20, "8043137211", "1", "0", "")
+            elif n == 7: # 주식분봉차트조회요청
+                self.kiwoom.get_minutes_data("005930", "5")
 
     def start_test(self):
         # tr 요청

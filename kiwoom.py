@@ -226,6 +226,13 @@ class Kiwoom:
             self.send_comm_rq_data("계좌별주문체결내역상세요청", "opw00007", 0, "2000")
             time.sleep(0.3)
 
+    # 분봉차트 조회
+    def get_minutes_data(self, item_code, minute_type):
+        self.set_input_value("종목코드", item_code)
+        self.set_input_value("틱범위", minute_type)
+        self.set_input_value("수정주가구분", "0")
+        self.send_comm_rq_data("주식분봉차트조회요청", "opt10080", 0, "2000")
+
     def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
         '''
@@ -252,28 +259,20 @@ class Kiwoom:
             deposit = self.get_comm_data(sTrCode, sRQName, 0, "예수금")
             ok_deposit = self.get_comm_data(sTrCode, sRQName, 0, "출금가능금액")
             buy_deposit = self.get_comm_data(sTrCode, sRQName, 0, "주문가능금액")
-
             view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
             self.tr_event_loop.exit()
 
-
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
-
             total_buy_money = self.get_comm_data(sTrCode, sRQName, 0, "총매입금액")
             total_profit_loss_rate = self.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)")
-
             view.계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate)
             self.tr_event_loop.exit()
-
 
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
 
-            repeat = self.ocx.dynamicCall("GetRepeatCnt(String, String)", sTrCode, sRQName)
-
-            if repeat == 0:
-                repeat = 1
+            repeat = self.get_repeat_cnt(sTrCode, sRQName)
 
             for i in range(repeat):
                 order_number = self.get_comm_data(sTrCode, sRecordName, i, "주문번호")
@@ -286,6 +285,32 @@ class Kiwoom:
                 if order_number != "":
                     view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_count, trade_price, order_type)
             self.tr_event_loop.exit()
+
+        elif sRQName == "주식분봉차트조회요청":
+
+            repeat = self.get_repeat_cnt(sTrCode, sRQName)
+
+            for i in range(repeat):
+                current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
+                volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
+                open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
+                high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
+                low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
+                time = self.get_comm_data(sTrCode, sRecordName, i, "체결시간")
+
+                view.주식분봉차트조회요청(time, current_price, open_price, high_price, low_price, volume)
+            self.tr_event_loop.exit()
+        
+
+
+
+
+
+
+
+
+
+
 
     # tr요청 기본 함수
     # tr 데이터 정보 입력
@@ -301,6 +326,8 @@ class Kiwoom:
     # tr 반복수 받음
     def get_repeat_cnt(self, trcode, rqname):
         repeat_cnt = self.ocx.dynamicCall("GetRepeatCnt(String, String)", trcode, rqname)
+        if repeat_cnt == 0:
+            repeat_cnt = 1
         return repeat_cnt
 
     # 매수 매도 데이터 전송
