@@ -54,7 +54,7 @@ class Kiwoom:
     # 이벤트 요청 연결
     def connect_event(self):
         self.ocx.OnEventConnect.connect(self.login_slot)
-        self.ocx.OnReceiveTrData.connect(self.trdata_slot)
+        self.ocx.OnReceiveTrData.connect(self.receive_trdata)
 
     def create_loop_event(self):
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
@@ -248,7 +248,7 @@ class Kiwoom:
         self.set_input_value("수정주가구분", "0")
         self.send_comm_rq_data("주식주봉차트조회요청", "opt10082", 0, "2000")
 
-    def trdata_slot(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
+    def receive_trdata(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
         # TR SLOT 만들기
         '''
         TR 요청을 받는 구역, slot임
@@ -343,6 +343,10 @@ class Kiwoom:
 
                 view.주식주봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
             self.tr_event_loop.exit()
+
+
+
+
 
     # tr요청 기본 함수
     # tr 데이터 정보 입력
