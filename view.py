@@ -13,9 +13,10 @@ def 계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate
     print("총수익률 %s" % float(total_profit_loss_rate))
     print("--------------------------")
 
-def 계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_count, trade_price, order_type):
+def 계좌별주문체결내역상세요청출력(order_number, item_code,  item_name, trade_time, trade_count, trade_price, order_type):
     print("--------------------------")
-    print("주문번호 :  %s" % order_number)
+    print("주문시간 : %s" %trade_time)
+    print("주문번호 : %s" % order_number)
     print("종목번호 : %s" % item_code)
     print("종목명   : %s" % item_name)
     print("체결수량 : %s" % (trade_count))

@@ -250,7 +250,6 @@ class Kiwoom:
 
 
 
-    # 수신하는 함수
 
     #  예수금상세현황요청 값 받기
     def receive_detail_account_info(self, sTrCode, sRQName):
@@ -273,12 +272,13 @@ class Kiwoom:
             order_number = self.get_comm_data(sTrCode, sRecordName, i, "주문번호")
             item_code = self.get_comm_data(sTrCode, sRecordName, i, "종목번호")
             item_name = self.get_comm_data(sTrCode, sRecordName, i, "종목명")
+            trade_time = self.get_comm_data(sTrCode, sRecordName, i, "주문시간")
             trade_count = self.get_comm_data(sTrCode, sRecordName, i, "체결수량")
             trade_price = self.get_comm_data(sTrCode, sRecordName, i, "체결단가")
             order_type = self.get_comm_data(sTrCode, sRecordName, i, "매매구분")
 
             if order_number != "":
-                view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_count, trade_price, order_type)
+                view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_time, trade_count, trade_price, order_type)
 
     # 분봉차트 값 받기
     def receive_minutes_chart_data(self,sTrCode, sRQName, sRecordName):
