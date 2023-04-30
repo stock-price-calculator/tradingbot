@@ -6,12 +6,14 @@ from PyQt5.QtWidgets import *
 import constants
 from kiwoom import Kiwoom
 from account.my_account import Kiwoom_Account
+from order.trade import Kiwoom_Trade
 
 class TradingBot():
     def __init__(self):
         super().__init__()
         self.kiwoom = Kiwoom()
         self.kiwoom_account = Kiwoom_Account(self.kiwoom)
+        self.kiwoom_trade = Kiwoom_Trade(self.kiwoom)
 
         while True:
             n = int(input("메뉴번호를 선택하세요 : "))
