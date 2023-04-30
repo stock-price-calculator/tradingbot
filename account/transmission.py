@@ -22,10 +22,12 @@ def get_trading_record_date(term):
     return result_date
 
 
-class Kiwoom_Account:
+class Kiwoom_Send_Account:
 
     def __init__(self, main_kiwoom):
         self.Kiwoom = main_kiwoom
+
+    # 요청하는 함수
 
     # 예수금상세현황요청
     def get_detail_account_info(self, account):
@@ -66,3 +68,5 @@ class Kiwoom_Account:
             Kiwoom.set_input_value(self.Kiwoom, "시작주문번호", "")
             Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
             time.sleep(0.3)
+
+
