@@ -5,34 +5,36 @@ from PyQt5.QtCore import QEventLoop
 from PyQt5.QtWidgets import *
 import constants
 from kiwoom import Kiwoom
+from account.my_account import Kiwoom_Account
 
-class MyWindow():
+class TradingBot():
     def __init__(self):
         super().__init__()
         self.kiwoom = Kiwoom()
+        self.kiwoom_account = Kiwoom_Account(self.kiwoom)
 
         while True:
             n = int(input("메뉴번호를 선택하세요 : "))
-            if n == 1:  # 시장가 매수
-                buy_order = self.kiwoom.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
-                print("결과값 : ", buy_order)
-            elif n == 2: # 시장가 매도
-                sell_order = self.kiwoom.send_sell_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
-                print("결과값 : ", sell_order)
-            elif n == 3: # 테스트
+            # if n == 1:  # 시장가 매수
+            #     buy_order = self.kiwoom.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
+            #     print("결과값 : ", buy_order)
+            # elif n == 2: # 시장가 매도
+            #     sell_order = self.kiwoom.send_sell_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
+            #     print("결과값 : ", sell_order)
+            if n == 3: # 테스트
                 self.start_test()
             elif n == 4: # 예수금
-                self.kiwoom.get_detail_account_info(constants.ACCOUNT)
+                self.kiwoom_account.get_detail_account_info(constants.ACCOUNT)
             elif n == 5: #총수익률
-                self.kiwoom.get_detail_account_mystock(constants.ACCOUNT)
+                self.kiwoom_account.get_detail_account_mystock(constants.ACCOUNT)
             elif n == 6: # 계좌별주문체결내역상세요청
-                self.kiwoom.get_trading_record(20, constants.ACCOUNT, "1", "0", "")
-            elif n == 7: # 주식분봉차트조회요청
-                self.kiwoom.get_minutes_chart_data(constants.SAMSUNG_CODE, "5")
-            elif n == 8:  # 주식일봉차트조회요청
-                self.kiwoom.get_day_chart_data(constants.SAMSUNG_CODE, "20230413")
-            elif n == 9: # 주식주봉차트조회요청
-                self.kiwoom.get_week_chart_data(constants.SAMSUNG_CODE,"20160101","20230413")
+                self.kiwoom_account.get_trading_record(20, constants.ACCOUNT, "1", "0", "")
+            # elif n == 7: # 주식분봉차트조회요청
+            #     self.kiwoom.get_minutes_chart_data(constants.SAMSUNG_CODE, "5")
+            # elif n == 8:  # 주식일봉차트조회요청
+            #     self.kiwoom.get_day_chart_data(constants.SAMSUNG_CODE, "20230413")
+            # elif n == 9: # 주식주봉차트조회요청
+            #     self.kiwoom.get_week_chart_data(constants.SAMSUNG_CODE,"20160101","20230413")
 
     def start_test(self):
         # tr 요청
@@ -57,6 +59,6 @@ class MyWindow():
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MyWindow()
+    window = TradingBot()
     #window.show()
     app.exec_()
