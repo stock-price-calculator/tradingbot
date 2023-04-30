@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 import constants
 from kiwoom import Kiwoom
 
-class MyWindow():
+class TradingBot():
     def __init__(self):
         super().__init__()
         self.kiwoom = Kiwoom()
@@ -57,6 +57,6 @@ class MyWindow():
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MyWindow()
+    window = TradingBot()
     #window.show()
     app.exec_()

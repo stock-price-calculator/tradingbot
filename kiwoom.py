@@ -280,6 +280,7 @@ class Kiwoom:
             if order_number != "":
                 view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_time, trade_count, trade_price, order_type)
 
+
     # 분봉차트 값 받기
     def receive_minutes_chart_data(self,sTrCode, sRQName, sRecordName):
         repeat = self.get_repeat_cnt(sTrCode, sRQName)
@@ -355,8 +356,6 @@ class Kiwoom:
             self.receive_week_chart_data(sTrCode, sRQName, sRecordName)
 
         self.tr_event_loop.exit()
-
-
 
 
 
