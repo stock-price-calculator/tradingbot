@@ -1,5 +1,6 @@
 import view.market_view as view
-
+from datetime import datetime
+from pandas import DataFrame
 
 class Kiwoom_Receive_Market_price:
 
@@ -10,17 +11,19 @@ class Kiwoom_Receive_Market_price:
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
 
         received_data = []
-        for i in range(1):
-            current_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "현재가").strip()
-            volume = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "거래량").strip()
-            open_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "시가").strip()
-            high_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "고가").strip()
-            low_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "저가").strip()
+        for i in range(5):
+            current_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "현재가").strip())
+            volume = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "거래량").strip())
+            open_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "시가").strip())
+            high_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "고가").strip())
+            low_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "저가").strip())
             standard_minute = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "체결시간").strip()
-            received_data.append([standard_minute,current_price,open_price,high_price,low_price,volume])
-            print(received_data)
-            #view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
-
+            standard_minute = datetime.strptime(standard_minute, "%Y%m%d%H%M%S")
+            received_data.append([standard_minute, abs(current_price), abs(open_price), abs(high_price), abs(low_price), volume])
+            # received_data = list(map(abs,received_data))
+            dataframe = DataFrame(received_data, columns=['time', 'current', 'open', 'high', 'low', 'volume'])
+            print(dataframe)
+            # view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
     # 일봉차트 값 받기
     def receive_day_chart_data(self,sTrCode, sRQName, sRecordName):
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
