@@ -1,9 +1,6 @@
-
-
-
-
-
 from kiwoom import Kiwoom
+
+
 class Kiwoom_Price:
 
     def __init__(self, main_kiwoom):
@@ -30,5 +27,3 @@ class Kiwoom_Price:
         Kiwoom.set_input_value(self.Kiwoom, "끝일자", last_date)
         Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "주식주봉차트조회요청", "opt10082", 0, "2000")
-
-

@@ -1,4 +1,4 @@
-import view
+import view.account_view as view
 
 
 class Kiwoom_Receive_Account:

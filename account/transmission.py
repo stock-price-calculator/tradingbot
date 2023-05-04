@@ -12,6 +12,7 @@ def get_trading_record_date(term):
 
     for i in range(0, term):
         original_date = current_date - datetime.timedelta(days=i)
+
         splits = str(original_date).split("-")
         conversion_date = splits[0] + splits[1] + splits[2]
         weekend_date = datetime.date(int(splits[0]), int(splits[1]), int(splits[2])).weekday()

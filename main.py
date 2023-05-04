@@ -32,7 +32,7 @@ class TradingBot():
             elif n == 5: #총수익률
                 self.kiwoom_account.get_detail_account_mystock(constants.ACCOUNT)
             elif n == 6: # 계좌별주문체결내역상세요청
-                self.kiwoom_account.get_trading_record(20, constants.ACCOUNT, "1", "0", "")
+                self.kiwoom_account.get_trading_record(30, constants.ACCOUNT, "1", "0", "")
             elif n == 7: # 주식분봉차트조회요청
                 self.kiwoom_price.get_minutes_chart_data(constants.SAMSUNG_CODE, "5")
             elif n == 8:  # 주식일봉차트조회요청

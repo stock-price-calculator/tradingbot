@@ -1,4 +1,4 @@
-import view
+import view.market_view as view
 
 
 class Kiwoom_Receive_Market_price:
