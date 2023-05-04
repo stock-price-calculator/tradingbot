@@ -22,14 +22,14 @@ def plot_bollinger_bands(data_list, n=20, k=2):
     plt.plot(df.index, df['lowerb'], linestyle='dashed', label='Lower band')
     plt.legend(loc='best')
     plt.savefig('test.png')
-def minites_backtesting(data_list):
+def minites_backtesting(data_list, n=20, k=2):
     columns = ['time', 'current', 'open', 'high', 'low', 'volume']
     df = pd.DataFrame(data_list, columns=columns)
 
-    df['ma'] = df['current'].rolling(20).mean()
-    df["std"] = df["current"].rolling(20).std()
-    df["upperb"] = df["ma"] + (df["std"] * 2)
-    df["lowerb"] = df["ma"] - (df["std"] * 2)
+    df['ma'] = df['current'].rolling(n).mean()
+    df["std"] = df["current"].rolling(n).std()
+    df["upperb"] = df["ma"] + (df["std"] * k)
+    df["lowerb"] = df["ma"] - (df["std"] * k)
 
     plt.style.use('seaborn')
     plt.figure(figsize=(20, 10))
