@@ -12,7 +12,7 @@ import constants
 from PyQt5.QAxContainer import *
 from account.reception import Kiwoom_Receive_Account
 from market.reception import Kiwoom_Receive_Market_price
-
+from backtesting.backtest import *
 
 
 
@@ -108,7 +108,8 @@ class Kiwoom:
         elif sRQName == "계좌별주문체결내역상세요청":
             self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
-            self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+            data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+            minites_backtesting(data_list)
         elif sRQName == "주식일봉차트조회요청":
             self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식주봉차트조회요청":
