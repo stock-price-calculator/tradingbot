@@ -19,6 +19,7 @@ from backtesting.backtest import *
 class Kiwoom:
     def __init__(self):
 
+        self.remained_data = False  #차트데이터 요청할때 sPrevNext가 2이면 계속
         self.login_event_loop = None
         self.tr_event_loop = None
         self.ocx = None
@@ -97,6 +98,11 @@ class Kiwoom:
         '''
 
         # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
+        if sPrevNext == "2":
+            self.remained_data = True
+        else:
+            self.remained_data = False
+
 
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
@@ -109,8 +115,11 @@ class Kiwoom:
             self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
             data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
-            minites_backtesting(data_list)
+            # minites_backtesting(data_list)
+            print(data_list)
+            print("----------------------")
             print(sPrevNext)
+            print("----------------------")
         elif sRQName == "주식일봉차트조회요청":
             self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식주봉차트조회요청":

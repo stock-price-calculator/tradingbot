@@ -1,5 +1,5 @@
 from kiwoom import Kiwoom
-
+import time
 
 class Kiwoom_Price:
 
@@ -12,6 +12,13 @@ class Kiwoom_Price:
         Kiwoom.set_input_value(self.Kiwoom, "틱범위", minute_type)
         Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "주식분봉차트조회요청", "opt10080", 0, "2000")
+
+        while self.Kiwoom.remained_data == True:
+            time.sleep(0.2)
+            Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
+            Kiwoom.set_input_value(self.Kiwoom, "틱범위", minute_type)
+            Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
+            Kiwoom.send_comm_rq_data(self.Kiwoom, "주식분봉차트조회요청", "opt10080", 2, "2000")
 
     # 일봉차트 조회
     def get_day_chart_data(self, item_code, start_date):
