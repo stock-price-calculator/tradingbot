@@ -10,35 +10,16 @@ from PyQt5.QtCore import QEventLoop
 
 import constants
 from PyQt5.QAxContainer import *
+from account.reception import Kiwoom_Receive_Account
+from market.reception import Kiwoom_Receive_Market_price
+from backtesting.backtest import *
 
-
-def changed_trading_type(name):
-    if (name == "지정가"):
-        return constants.LIMIT_PRICE_VALUE
-    else:
-        return constants.MARKET_PRICE_VALUE
-
-
-def change_order_type(name):
-    if (name == "신규매수"):
-        return constants.NEW_BUY
-    elif (name == "신규매도"):
-        return constants.NEW_SELL
-    elif (name == "매수취소"):
-        return constants.CANCEL_BUY
-    elif (name == "매도취소"):
-        return constants.CANCEL_SELL
-    elif (name == "매수정정"):
-        return constants.CHANGE_BUY
-    elif (name == "매도정정"):
-        return constants.CHANGE_SELL
-    else:
-        return constants.ERROR_CODE
 
 
 class Kiwoom:
     def __init__(self):
 
+        self.remained_data = False  #차트데이터 요청할때 sPrevNext가 2이면 계속
         self.login_event_loop = None
         self.tr_event_loop = None
         self.ocx = None
@@ -46,6 +27,8 @@ class Kiwoom:
         self.create_kiwoom_instance()
         self.connect_event()
         self.connect_login()
+        self.receive_account = Kiwoom_Receive_Account(self)
+        self.receive_market_price = Kiwoom_Receive_Market_price(self)
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
@@ -99,231 +82,6 @@ class Kiwoom:
         result = self.ocx.dynamicCall("GetMasterLastPrice(QString)", code)
         return result
 
-    # SendOrder 호출
-    def send_buy_order(self, account, item_code, quantity, price, trading_type):
-
-        order_params = {
-            "rq_name": "신규매수주문",
-            "screen_number": "0101",
-            "account_number": account,
-            "order_type": constants.NEW_BUY,
-            "code": item_code,
-            "stock_quantity": quantity,
-            "price": price,
-            "trading_type": changed_trading_type(trading_type),
-            "origin_order_number": '',
-        }
-        result = self.send_trading_data(order_params)
-
-        return result
-
-    # SendOrder 호출
-    def send_sell_order(self, account, item_code, quantity, price, trading_type):
-
-        order_params = {
-            "rq_name": "신규매도주문",
-            "screen_number": "0101",
-            "account_number": account,
-            "order_type": constants.NEW_SELL,
-            "code": item_code,
-            "stock_quantity": quantity,
-            "price": price,
-            "trading_type": changed_trading_type(trading_type),
-            "origin_order_number": '',
-        }
-        result = self.send_trading_data(order_params)
-
-        return result
-
-    # SendOrder 호출
-    def cancel_buy_order(self, account, item_code, quantity, price, trading_type, original_order_num):
-
-        order_params = {
-            "rq_name": "매수취소주문",
-            "screen_number": "0101",
-            "account_number": account,
-            "order_type": constants.CANCEL_BUY,
-            "code": item_code,
-            "stock_quantity": quantity,
-            "price": price,
-            "trading_type": changed_trading_type(trading_type),
-            "origin_order_number": original_order_num,
-        }
-        result = self.send_trading_data(order_params)
-
-        return result
-
-    # SendOrder 호출
-    def cancel_sell_order(self, account, item_code, quantity, price, trading_type, original_order_num):
-        order_params = {
-            "rq_name": "매도취소주문",
-            "screen_number": "0101",
-            "account_number": account,
-            "order_type": constants.CANCEL_BUY,
-            "code": item_code,
-            "stock_quantity": quantity,
-            "price": price,
-            "trading_type": changed_trading_type(trading_type),
-            "origin_order_number": original_order_num,
-        }
-
-        result = self.send_trading_data(order_params)
-
-        return result
-
-    # 예수금상세현황요청
-    def get_detail_account_info(self, account):
-        self.set_input_value("계좌번호", account)
-        self.set_input_value("비밀번호", "0000")
-        self.set_input_value("비밀번호입력매체구분", "00")
-        self.set_input_value("조회구분", "2")
-        self.send_comm_rq_data("예수금상세현황요청", "opw00001", 0, "2000")
-
-    # 계좌평가잔고내역요청
-    def get_detail_account_mystock(self, account, sPrevNext="0"):
-
-        # sPrevNext="0" : 싱글데이터 받아오기(종목합계 데이터)
-        self.set_input_value("계좌번호", account)
-        self.set_input_value("비밀번호", "0000")
-        self.set_input_value("비밀번호입력매체구분", "00")
-        self.set_input_value("조회구분", "2")
-        self.send_comm_rq_data("계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
-
-    # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
-    def get_trading_record_date(self, term):
-        result_date = []
-        current_date = datetime.date.today()
-
-        for i in range(0, term):
-            original_date = current_date - datetime.timedelta(days=i)
-            splits = str(original_date).split("-")
-            conversion_date = splits[0] + splits[1] + splits[2]
-            weekend_date = datetime.date(int(splits[0]), int(splits[1]), int(splits[2])).weekday()
-            if weekend_date > 4:
-                pass
-            else:
-                result_date.append(conversion_date)
-        return result_date
-
-    # 체결내역
-    def get_trading_record(self, term, account, find_division, buy_or_sell, item_code):
-        print("체결내역 서버에 요청")
-
-        # term기간만큼 이전날짜 가져옴
-        all_date = self.get_trading_record_date(term)
-
-        for day in reversed(all_date):
-            self.set_input_value("주문일자", day)
-            self.set_input_value("계좌번호", account)
-            self.set_input_value("비밀번호", "0000")
-            self.set_input_value("비밀번호입력매체구분", "00")
-            self.set_input_value("조회구분", find_division)
-            self.set_input_value("주식채권구분", "1")
-            self.set_input_value("매도수구분", buy_or_sell)
-            self.set_input_value("종목코드", item_code)
-            self.set_input_value("시작주문번호", "")
-            self.send_comm_rq_data("계좌별주문체결내역상세요청", "opw00007", 0, "2000")
-            time.sleep(0.3)
-
-    # 분봉차트 조회
-    def get_minutes_chart_data(self, item_code, minute_type):
-        self.set_input_value("종목코드", item_code)
-        self.set_input_value("틱범위", minute_type)
-        self.set_input_value("수정주가구분", "0")
-        self.send_comm_rq_data("주식분봉차트조회요청", "opt10080", 0, "2000")
-
-    # 일봉차트 조회
-    def get_day_chart_data(self, item_code, start_date):
-        self.set_input_value("종목코드", item_code)
-        self.set_input_value("기준일자", start_date)
-        self.set_input_value("수정주가구분", "0")
-        self.send_comm_rq_data("주식일봉차트조회요청", "opt10081", 0, "2000")
-
-    # 주봉차트 조회
-    def get_week_chart_data(self, item_code, start_date, last_date):
-        self.set_input_value("종목코드", item_code)
-        self.set_input_value("기준일자", start_date)
-        self.set_input_value("끝일자", last_date)
-        self.set_input_value("수정주가구분", "0")
-        self.send_comm_rq_data("주식주봉차트조회요청", "opt10082", 0, "2000")
-
-
-
-
-
-    #  예수금상세현황요청 값 받기
-    def receive_detail_account_info(self, sTrCode, sRQName):
-        deposit = self.get_comm_data(sTrCode, sRQName, 0, "예수금")
-        ok_deposit = self.get_comm_data(sTrCode, sRQName, 0, "출금가능금액")
-        buy_deposit = self.get_comm_data(sTrCode, sRQName, 0, "주문가능금액")
-        view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
-
-    # 계좌평가잔고내역요청 값 받기
-    def receive_detail_account_mystock(self, sTrCode, sRQName):
-        total_buy_money = self.get_comm_data(sTrCode, sRQName, 0, "총매입금액")
-        total_profit_loss_rate = self.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)")
-        view.계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate)
-
-    # 계좌별주문체결내역상세요청 값 받기
-    def receive_trading_record(self,sTrCode, sRQName, sRecordName):
-        repeat = self.get_repeat_cnt(sTrCode, sRQName)
-
-        for i in range(repeat):
-            order_number = self.get_comm_data(sTrCode, sRecordName, i, "주문번호")
-            item_code = self.get_comm_data(sTrCode, sRecordName, i, "종목번호")
-            item_name = self.get_comm_data(sTrCode, sRecordName, i, "종목명")
-            trade_time = self.get_comm_data(sTrCode, sRecordName, i, "주문시간")
-            trade_count = self.get_comm_data(sTrCode, sRecordName, i, "체결수량")
-            trade_price = self.get_comm_data(sTrCode, sRecordName, i, "체결단가")
-            order_type = self.get_comm_data(sTrCode, sRecordName, i, "매매구분")
-
-            if order_number != "":
-                view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_time, trade_count, trade_price, order_type)
-
-
-    # 분봉차트 값 받기
-    def receive_minutes_chart_data(self,sTrCode, sRQName, sRecordName):
-        repeat = self.get_repeat_cnt(sTrCode, sRQName)
-
-        for i in range(repeat):
-            current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
-            volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
-            open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
-            high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
-            low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
-            standard_minute = self.get_comm_data(sTrCode, sRecordName, i, "체결시간")
-
-            view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
-
-    # 일봉차트 값 받기
-    def receive_day_chart_data(self,sTrCode, sRQName, sRecordName):
-        repeat = self.get_repeat_cnt(sTrCode, sRQName)
-
-        for i in range(repeat):
-            current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
-            volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
-            open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
-            high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
-            low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
-            standard_day = self.get_comm_data(sTrCode, sRecordName, i, "일자")
-
-            view.주식일봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
-
-    # 주봉차트 값 받기
-    def receive_week_chart_data(self, sTrCode, sRQName, sRecordName):
-        repeat = self.get_repeat_cnt(sTrCode, sRQName)
-
-        for i in range(repeat):
-            current_price = self.get_comm_data(sTrCode, sRecordName, i, "현재가")
-            volume = self.get_comm_data(sTrCode, sRecordName, i, "거래량")
-            open_price = self.get_comm_data(sTrCode, sRecordName, i, "시가")
-            high_price = self.get_comm_data(sTrCode, sRecordName, i, "고가")
-            low_price = self.get_comm_data(sTrCode, sRecordName, i, "저가")
-            standard_day = self.get_comm_data(sTrCode, sRecordName, i, "일자")
-
-            view.주식주봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
-
-
     # 요청한 tr값 수신
     def receive_trdata(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
 
@@ -338,22 +96,32 @@ class Kiwoom:
         '''
 
         # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
+        if sPrevNext == "2":
+            self.remained_data = True
+        else:
+            self.remained_data = False
+
 
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
-            self.receive_detail_account_info(sTrCode, sRQName)
+            self.receive_account.receive_detail_account_info(sTrCode, sRQName)
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
-            self.receive_detail_account_mystock(sTrCode, sRQName)
+            self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
-            self.receive_trading_record(sTrCode, sRQName, sRecordName)
+            self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
-            self.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+            data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+            # minites_backtesting(data_list)
+            print(data_list)
+            print("----------------------")
+            print(sPrevNext)
+            print("----------------------")
         elif sRQName == "주식일봉차트조회요청":
-            self.receive_day_chart_data(sTrCode, sRQName, sRecordName)
+            self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식주봉차트조회요청":
-            self.receive_week_chart_data(sTrCode, sRQName, sRecordName)
+            self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
 
         self.tr_event_loop.exit()
 
