@@ -29,6 +29,7 @@ class Kiwoom:
         self.connect_login()
         self.receive_account = Kiwoom_Receive_Account(self)
         self.receive_market_price = Kiwoom_Receive_Market_price(self)
+        self.result_list = []
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
@@ -100,8 +101,7 @@ class Kiwoom:
             self.remained_data = True
         else:
             self.remained_data = False
-
-
+        print(sPrevNext)
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
             self.receive_account.receive_detail_account_info(sTrCode, sRQName)
@@ -113,11 +113,12 @@ class Kiwoom:
             self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
             data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
-            # minites_backtesting(data_list)
-            print(data_list)
-            print("----------------------")
-            print(sPrevNext)
-            print("----------------------")
+            self.result_list.append(data_list)
+            if self.remained_data == False:
+                plot_bollinger_bands(self.result_list)
+            else:
+                print("지금아님")
+
         elif sRQName == "주식일봉차트조회요청":
             self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식주봉차트조회요청":

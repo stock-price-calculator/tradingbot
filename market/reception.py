@@ -7,6 +7,7 @@ class Kiwoom_Receive_Market_price:
 
     def __init__(self, main_kiwoom):
         self.Kiwoom = main_kiwoom
+
     #분봉차트 값 받기
     def receive_minutes_chart_data(self,sTrCode, sRQName, sRecordName):
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
@@ -24,9 +25,8 @@ class Kiwoom_Receive_Market_price:
             received_data.append([standard_minute, abs(current_price), abs(open_price), abs(high_price), abs(low_price), volume])
 
         return received_data
-            # print(df.iloc[0]['open'])
-            # print(df.iloc[0]['current'])
             # view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
+
     # 일봉차트 값 받기
     def receive_day_chart_data(self,sTrCode, sRQName, sRecordName):
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
