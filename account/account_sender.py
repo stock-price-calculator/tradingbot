@@ -31,7 +31,7 @@ class Kiwoom_Send_Account:
     # 요청하는 함수
 
     # 예수금상세현황요청
-    def get_detail_account_info(self, account):
+    def send_detail_account_info(self, account):
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호", "0000")
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호입력매체구분", "00")
@@ -39,7 +39,7 @@ class Kiwoom_Send_Account:
         Kiwoom.send_comm_rq_data(self.Kiwoom, "예수금상세현황요청", "opw00001", 0, "2000")
 
     # 계좌평가잔고내역요청
-    def get_detail_account_mystock(self, account, sPrevNext="0"):
+    def send_detail_account_mystock(self, account, sPrevNext="0"):
 
         # sPrevNext="0" : 싱글데이터 받아오기(종목합계 데이터)
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
@@ -51,7 +51,7 @@ class Kiwoom_Send_Account:
     # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
 
     # 체결내역
-    def get_trading_record(self, term, account, find_division, buy_or_sell, item_code):
+    def send_trading_record(self, term, account, find_division, buy_or_sell, item_code):
         print("체결내역 서버에 요청")
 
         # term기간만큼 이전날짜 가져옴

@@ -5,7 +5,7 @@ from PyQt5.QtCore import QEventLoop
 from PyQt5.QtWidgets import *
 import constants
 from kiwoom import Kiwoom
-from account.transmission import Kiwoom_Send_Account
+from account.account_sender import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
 
@@ -28,11 +28,11 @@ class TradingBot():
             if n == 3: # 테스트
                 self.start_test()
             elif n == 4: # 예수금
-                self.kiwoom_account.get_detail_account_info(constants.ACCOUNT)
-            elif n == 5: #총수익률
-                self.kiwoom_account.get_detail_account_mystock(constants.ACCOUNT)
+                self.kiwoom_account.send_detail_account_info(constants.ACCOUNT)
+            elif n == 5: #총수익률s
+                self.kiwoom_account.send_detail_account_mystock(constants.ACCOUNT)
             elif n == 6: # 계좌별주문체결내역상세요청
-                self.kiwoom_account.get_trading_record(30, constants.ACCOUNT, "1", "0", "")
+                self.kiwoom_account.send_trading_record(30, constants.ACCOUNT, "1", "0", "")
             elif n == 7: # 주식분봉차트조회요청
                 self.kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5", 3)
             elif n == 8:  # 주식일봉차트조회요청
