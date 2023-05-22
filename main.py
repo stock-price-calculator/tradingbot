@@ -7,7 +7,7 @@ import constants
 from kiwoom import Kiwoom
 from account.transmission import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
-from market.transmission import Kiwoom_Price
+from market.stick_data_sender import Kiwoom_Price
 
 class TradingBot():
     def __init__(self):
@@ -34,11 +34,11 @@ class TradingBot():
             elif n == 6: # 계좌별주문체결내역상세요청
                 self.kiwoom_account.get_trading_record(30, constants.ACCOUNT, "1", "0", "")
             elif n == 7: # 주식분봉차트조회요청
-                self.kiwoom_price.get_minutes_chart_data(constants.SAMSUNG_CODE, "5", 3)
+                self.kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5", 3)
             elif n == 8:  # 주식일봉차트조회요청
-                self.kiwoom_price.get_day_chart_data(constants.SAMSUNG_CODE, "20230413")
+                self.kiwoom_price.send_day_chart_data(constants.SAMSUNG_CODE, "20230413")
             elif n == 9: # 주식주봉차트조회요청
-                self.kiwoom_price.get_week_chart_data(constants.SAMSUNG_CODE,"20160101","20230413")
+                self.kiwoom_price.send_week_chart_data(constants.SAMSUNG_CODE,"20160101","20230413")
 
     def start_test(self):
         # tr 요청

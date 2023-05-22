@@ -11,7 +11,7 @@ from PyQt5.QtCore import QEventLoop
 import constants
 from PyQt5.QAxContainer import *
 from account.reception import Kiwoom_Receive_Account
-from market.reception import Kiwoom_Receive_Market_price
+from market.stick_data_receiver import Kiwoom_Receive_Market_price
 from backtesting.backtest import *
 
 
