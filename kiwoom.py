@@ -117,7 +117,8 @@ class Kiwoom:
             self.result_list += data_list
 
             if not self.remained_data:
-                plot_bollinger_bands(self.result_list)
+                # plot_bollinger_bands(self.result_list)
+                bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
                 self.result_list.clear()
 
         elif sRQName == "주식일봉차트조회요청":

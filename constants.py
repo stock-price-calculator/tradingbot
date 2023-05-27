@@ -32,3 +32,6 @@ _constant.CHANGE_SELL = 6
 
 _constant.ACCOUNT = "8043137211"
 _constant.SAMSUNG_CODE = "005930"
+
+#backtest.py
+_constant.TRADE_CHARGE = 0.015
