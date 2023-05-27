@@ -11,8 +11,10 @@ class Kiwoom_Receive_Market_price:
     #분봉차트 값 받기
     def receive_minutes_chart_data(self,sTrCode, sRQName, sRecordName):
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
+        
 
         received_data = []
+        print(repeat)
         for i in range(repeat):
             current_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "현재가").strip())
             volume = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "거래량").strip())

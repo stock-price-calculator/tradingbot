@@ -14,6 +14,7 @@ def plot_bollinger_bands(data_list, n=20, k=2):
     df = df[n - 1:].copy()
 
     print(df)
+
     plt.figure(figsize=(9, 5))
     plt.plot(df.index, df['current'], label='Close')
     plt.plot(df.index, df['upperb'], linestyle='dashed', label='Upper band')

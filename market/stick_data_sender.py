@@ -1,6 +1,7 @@
 from kiwoom import Kiwoom
 import time
 
+
 class Kiwoom_Price:
 
     def __init__(self, main_kiwoom):
@@ -12,13 +13,21 @@ class Kiwoom_Price:
         Kiwoom.set_input_value(self.Kiwoom, "틱범위", minute_type)
         Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "주식분봉차트조회요청", "opt10080", 0, "2000")
-
-        while self.Kiwoom.remained_data:
+        data_count -= 1
+        print("첫번째 보냄")
+        if data_count == 0:
+            print("wnat값 0설정")
+            self.Kiwoom.want_data_count = 0  # count가 0일경우 또는 remain_data가 0일때 종료해야함
+        while self.Kiwoom.remained_data and data_count > 0:
+            print("두번째 보냄")
             time.sleep(0.2)
+            data_count -= 1
             Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
             Kiwoom.set_input_value(self.Kiwoom, "틱범위", minute_type)
             Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
             Kiwoom.send_comm_rq_data(self.Kiwoom, "주식분봉차트조회요청", "opt10080", 2, "2000")
+            self.Kiwoom.want_data_count = data_count
+
 
     # 일봉차트 조회
     def send_day_chart_data(self, item_code, start_date):
