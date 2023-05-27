@@ -113,7 +113,7 @@ class Kiwoom:
             self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
             data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
-            self.result_list.append(data_list)
+            self.result_list += data_list
             if not self.remained_data:
                 plot_bollinger_bands(self.result_list)
 
