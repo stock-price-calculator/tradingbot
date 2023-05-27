@@ -4,15 +4,16 @@ import pandas as pd
 
 
 def plot_bollinger_bands(data_list, n=20, k=2):
+
     columns = ['time', 'current', 'open', 'high', 'low', 'volume']
     pd.set_option('display.max_rows', None)
     df = pd.DataFrame(data_list, columns=columns)
+    print(df)
     df["ma"] = df["current"].rolling(n).mean()
     df["std"] = df["current"].rolling(n).std()
     df["upperb"] = df["ma"] + (df["std"] * k)
     df["lowerb"] = df["ma"] - (df["std"] * k)
     df = df[n - 1:].copy()
-    print(df)
 
     plt.figure(figsize=(9, 5))
     plt.plot(df.index, df['current'], label='Close')
@@ -26,18 +27,18 @@ def plot_bollinger_bands(data_list, n=20, k=2):
 def minites_backtesting(data_list, n=20, k=2):
     columns = ['time', 'current', 'open', 'high', 'low', 'volume']
     df = pd.DataFrame(data_list, columns=columns)
-
-    df['ma'] = df['current'].rolling(n).mean()
-    df["std"] = df["current"].rolling(n).std()
-    df["upperb"] = df["ma"] + (df["std"] * k)
-    df["lowerb"] = df["ma"] - (df["std"] * k)
-
-    plt.style.use('seaborn')
-    plt.figure(figsize=(20, 10))
-    plt.style.use('seaborn')
-    df[["upperb", "current", "ma", "lowerb"]].plot(ax=plt.gca())
-    plt.fill_between(df.index, df.lowerb, df.upperb, color="b", alpha=0.1)
-    plt.savefig('test.png')
+    print(df)
+    # df['ma'] = df['current'].rolling(n).mean()
+    # df["std"] = df["current"].rolling(n).std()
+    # df["upperb"] = df["ma"] + (df["std"] * k)
+    # df["lowerb"] = df["ma"] - (df["std"] * k)
+    #
+    # plt.style.use('seaborn')
+    # plt.figure(figsize=(20, 10))
+    # plt.style.use('seaborn')
+    # df[["upperb", "current", "ma", "lowerb"]].plot(ax=plt.gca())
+    # plt.fill_between(df.index, df.lowerb, df.upperb, color="b", alpha=0.1)
+    # plt.savefig('test.png')
 
 
 
