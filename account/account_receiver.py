@@ -35,3 +35,16 @@ class Kiwoom_Receive_Account:
             if order_number != "":
                 view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_time, trade_count, trade_price,
                                      order_type)
+
+    # 10085 계좌수익률요청
+    def receive_price_earning_ratio(self, sTrCode, sRecordName):
+
+        trade_time = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "일자").strip()
+        item_code = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "종목코드").strip()
+        item_name = self.Kiwoom.get_comm_data(sTrCode, sRecordName,0, "종목명").strip()
+        trade_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "현재가").strip()
+        trade_buy_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "매입가").strip()
+        trade_total_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName,0, "매입금액").strip()
+        item_buy_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "보유수량").strip()
+
+

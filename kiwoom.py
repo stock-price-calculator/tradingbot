@@ -20,7 +20,6 @@ class Kiwoom:
     def __init__(self):
 
         self.remained_data = False  #차트데이터 요청할때 sPrevNext가 2이면 계속
-        self.want_data_count = None    #차트데이터 요청할때 900개씩 몇번 요청할지
         self.login_event_loop = None
         self.tr_event_loop = None
         self.ocx = None
@@ -99,7 +98,7 @@ class Kiwoom:
 
         # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
 
-        if sPrevNext == "2" and self.want_data_count != 0:
+        if sPrevNext == "2":
             self.remained_data = True
         else:
             self.remained_data = False
@@ -117,8 +116,7 @@ class Kiwoom:
             data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
             self.result_list += data_list
 
-            if not self.remained_data or self.want_data_count == 0:
-                self.want_data_count = None
+            if not self.remained_data:
                 plot_bollinger_bands(self.result_list)
                 self.result_list.clear()
 

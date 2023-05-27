@@ -50,7 +50,7 @@ class Kiwoom_Send_Account:
 
     # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
 
-    # 체결내역
+    # 계좌별주문체결내역상세요청
     def send_trading_record(self, term, account, find_division, buy_or_sell, item_code):
         print("체결내역 서버에 요청")
 
@@ -71,3 +71,7 @@ class Kiwoom_Send_Account:
             time.sleep(0.3)
 
 
+    # 10085 계좌수익률 요청
+    def send_price_earning_ratio(self,account):
+        Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
+        Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌수익률요청", "opt10085", 0, "2000")
