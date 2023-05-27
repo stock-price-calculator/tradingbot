@@ -17,14 +17,12 @@ def plot_bollinger_bands(data_list, n=20, k=2):
     # col 생략 없이 출력
     pd.set_option('display.max_columns', None)
     print(df)
-    # 그래프로 만들기
-    set_graph(df, n)
 
     return df
 
 
 # 그래프로 만들기
-def set_graph(df,n):
+def set_graph(df, n):
     plt.figure(figsize=(9, 5))
     plt.plot(df.index, df['current'], label='Close')
     plt.plot(df.index, df['upperb'], linestyle='dashed', label='Upper band')
@@ -33,6 +31,6 @@ def set_graph(df,n):
     plt.legend(loc='best')
     plt.savefig('test.png')
 
-def minites_bollinger_backtesting(data_list):
 
+def minites_bollinger_backtesting(item_code, minute_type, data_list, account):
     df = plot_bollinger_bands(data_list)

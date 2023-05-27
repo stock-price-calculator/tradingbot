@@ -125,7 +125,7 @@ class Kiwoom:
         elif sRQName == "주식주봉차트조회요청":
             self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "계좌수익률요청":
-            self.receive_account.receive_price_earning_ratio(sTrCode, sRecordName)
+            self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
         self.tr_event_loop.exit()
 
 
