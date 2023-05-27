@@ -24,6 +24,16 @@ def 계좌별주문체결내역상세요청출력(order_number, item_code,  item
     print("매매구분 : %s" % (order_type))
     print("--------------------------")
 
+def 계좌수익률요청(trade_time, item_code, item_name, trade_price, trade_buy_price, trade_total_price, item_buy_count):
+    print("--------------------------")
+    print("일자 : %s" % trade_time)
+    print("종목코드 : %s" % item_code)
+    print("종목명   : %s" % item_name)
+    print("현재가 : %s" % (trade_price))
+    print("매입가 : %s" % (trade_buy_price))
+    print("매입총금액 : %s" % (trade_total_price))
+    print("보유수량 : %s" % (item_buy_count))
+    print("--------------------------")
 
 # receive_trdata 인자값들 출력
 def print_receive_trdata_element(sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):

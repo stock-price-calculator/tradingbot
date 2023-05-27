@@ -47,4 +47,5 @@ class Kiwoom_Receive_Account:
         trade_total_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName,0, "매입금액").strip()
         item_buy_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "보유수량").strip()
 
+        view.계좌수익률요청(trade_time, item_code, item_name, trade_price, trade_buy_price, trade_total_price, item_buy_count)
 
