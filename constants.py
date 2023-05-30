@@ -16,10 +16,10 @@ sys.modules[__name__] = _constant()
 
 _constant.ERROR_CODE = -1
 _constant.LIMIT_PRICE = "지정가"
-_constant.LIMIT_PRICE_VALUE = 0
+_constant.LIMIT_PRICE_VALUE = "00"
 
 _constant.MARKET_PRICE = "시장가"
-_constant.MARKET_PRICE_VALUE = 3
+_constant.MARKET_PRICE_VALUE = "03"
 
 _constant.NEW_BUY = 1
 _constant.NEW_SELL = 2
