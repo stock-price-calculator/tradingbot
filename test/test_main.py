@@ -72,13 +72,28 @@ class Kiwoom:
 
     def receive_realdata(self, sJongmokCode, sRealType, sRealData):
         if sRealType == "주식체결":
-            print("안녕")
+            print("-----------------------------------------")
+            print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
+            print("전일대비 : " + self.get_comm_real_data(sJongmokCode, 11))
+            print("등락율 : " + self.get_comm_real_data(sJongmokCode, 12))
+            print("매도호가 : " + self.get_comm_real_data(sJongmokCode, 27))
+            print("매수호가 : " + self.get_comm_real_data(sJongmokCode, 28))
+            print("누적거래량 : " + self.get_comm_real_data(sJongmokCode, 13))
+            print("시가 : " + self.get_comm_real_data(sJongmokCode, 16))
+            print("고가 : " + self.get_comm_real_data(sJongmokCode, 17))
+            print("저가 : " + self.get_comm_real_data(sJongmokCode, 18))
+            print("전일거래량대비 : " + self.get_comm_real_data(sJongmokCode, 26))
+            print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
+            print("상한가발생시간 : " + self.get_comm_real_data(sJongmokCode, 567))
+            print("하한가발생시간 : " + self.get_comm_real_data(sJongmokCode, 568))
+            print("-----------------------------------------")
 
     def SetRealReg(self, screen_no, code_list, fid_list, real_type):
         self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
                              screen_no, code_list, fid_list, real_type)
 
-
+    def get_comm_real_data(self, item_code, fid):
+        return self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
 
 
 
