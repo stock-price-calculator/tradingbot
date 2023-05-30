@@ -20,13 +20,13 @@ class Kiwoom:
     def __init__(self):
 
         self.remained_data = False  #차트데이터 요청할때 sPrevNext가 2이면 계속
-        self.login_event_loop = None
-        self.tr_event_loop = None
+        self.login_event_loop = None # login요청값을 받을 때 exit
+        self.tr_event_loop = None # tr요청값을 받을 때 exit
         self.ocx = None
         self.create_loop_event()
         self.create_kiwoom_instance()
         self.connect_event()
-        self.connect_login()
+        self.connect_login() # 로그인 요청
         self.receive_account = Kiwoom_Receive_Account(self)
         self.receive_market_price = Kiwoom_Receive_Market_price(self)
         self.result_list = []
@@ -40,6 +40,7 @@ class Kiwoom:
         self.ocx.OnEventConnect.connect(self.login_slot)
         self.ocx.OnReceiveTrData.connect(self.receive_trdata)
 
+    # 이벤트 루프 생성
     def create_loop_event(self):
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
 
