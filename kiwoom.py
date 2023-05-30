@@ -134,7 +134,6 @@ class Kiwoom:
         self.tr_event_loop.exit()
 
 
-
     # tr요청 기본 함수
     # tr 데이터 정보 입력
     def set_input_value(self, id, value):

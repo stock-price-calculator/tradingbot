@@ -14,19 +14,31 @@ from account.account_receiver import Kiwoom_Receive_Account
 from market.stick_data_receiver import Kiwoom_Receive_Market_price
 from backtesting.backtest import *
 
+import sys
+
+from PyQt5.QAxContainer import *
+from PyQt5.QtCore import QEventLoop
+from PyQt5.QtWidgets import *
+import constants
+from kiwoom import Kiwoom
+from account.account_sender import Kiwoom_Send_Account
+from order.trade import Kiwoom_Trade
+from market.stick_data_sender import Kiwoom_Price
+
 
 class Kiwoom:
     def __init__(self):
 
-        self.remained_data = False  # 차트데이터 요청할때 sPrevNext가 2이면 계속
-        self.login_event_loop = None
-        self.tr_event_loop = None
+
+        self.login_event_loop = None # login요청값을 받을 때 exit
+        self.tr_event_loop = None # tr요청값을 받을 때 exit
         self.ocx = None
         self.create_loop_event()
         self.create_kiwoom_instance()
         self.connect_event()
-        self.connect_login()
+        self.connect_login() # 로그인 요청
 
+        self.SetRealReg("0101", "005930", "10", "0")
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
@@ -35,8 +47,9 @@ class Kiwoom:
     # 이벤트 요청 연결
     def connect_event(self):
         self.ocx.OnEventConnect.connect(self.login_slot)
-        self.ocx.OnReceiveTrData.connect(self.receive_trdata)
+        self.ocx.OnReceiveRealData.connect(self.receive_realdata)
 
+    # 이벤트 루프 생성
     def create_loop_event(self):
         self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
 
@@ -45,7 +58,7 @@ class Kiwoom:
         self.ocx.dynamicCall("CommConnect()")
         self.login_event_loop.exec_()
 
-     # 로그인 성공 여부
+    # 로그인 성공 여부
     def login_slot(self, err_code):
         if err_code == 0:
             print("로그인에 성공하였습니다.")
@@ -55,13 +68,22 @@ class Kiwoom:
         self.login_event_loop.exit()
 
 
- # 요청한 tr값 수신
-    def receive_trdata(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
 
-        # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
 
-        # 예수금 등 조회 하기
-        if sRQName == "예수금상세현황요청":
-            self.receive_account.receive_detail_account_info(sTrCode, sRQName)
+    def receive_realdata(self, sJongmokCode, sRealType, sRealData):
+        if sRealType == "주식체결":
+            print("안녕")
 
-        self.tr_event_loop.exit()
+    def SetRealReg(self, screen_no, code_list, fid_list, real_type):
+        self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
+                             screen_no, code_list, fid_list, real_type)
+
+
+
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = Kiwoom()
+    #window.show()
+    app.exec_()
