@@ -24,7 +24,6 @@ class Kiwoom_Trade:
         result = Kiwoom.send_trading_data(self.Kiwoom, order_params)
 
         return result
-
     # 신규 매도 주문
     def send_sell_order(self, account, item_code, quantity, price, trading_type):
         order_params = {

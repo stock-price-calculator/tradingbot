@@ -128,6 +128,9 @@ class Kiwoom:
             self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
         elif sRQName == "계좌수익률요청":
             self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
+        elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
+            print("주문 완료")
+
         self.tr_event_loop.exit()
 
 
@@ -155,6 +158,8 @@ class Kiwoom:
         trade_data = self.ocx.dynamicCall(
             "SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)",
             list(order_params.values()), )
+        self.tr_event_loop = QEventLoop()
+        self.tr_event_loop.exec_()
         return trade_data
 
     def get_comm_data(self, trcode, record_name, next, rqname):

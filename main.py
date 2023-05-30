@@ -29,7 +29,7 @@ class TradingBot():
                 self.start_test()
             elif n == 4: # 예수금
                 self.kiwoom_account.send_detail_account_info(constants.ACCOUNT)
-            elif n == 5: #총수익률s
+            elif n == 5: #총수익률
                 self.kiwoom_account.send_detail_account_mystock(constants.ACCOUNT)
             elif n == 6: # 계좌별주문체결내역상세요청
                 self.kiwoom_account.send_trading_record(30, constants.ACCOUNT, "1", "0", "")
