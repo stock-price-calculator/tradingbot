@@ -32,7 +32,7 @@ class TradingBot():
             elif n == 5: #총수익률 - 총 매입금액, 수익률
                 self.kiwoom_account.send_detail_account_mystock(constants.ACCOUNT)
             elif n == 6: # 계좌별주문체결내역상세요청 - 날짜별 체결내역
-                self.kiwoom_account.send_trading_record(30, constants.ACCOUNT, "1", "0", "")
+                self.kiwoom_account.send_trading_record(150, constants.ACCOUNT, "1", "0", "")
             elif n == 7: # 주식분봉차트조회요청
                 self.kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
             elif n == 8:  # 주식일봉차트조회요청
@@ -41,6 +41,10 @@ class TradingBot():
                 self.kiwoom_price.send_week_chart_data(constants.SAMSUNG_CODE,"20160101","20230413")
             elif n == 10: # 계좌수익률요청 - 보유 주식량 확인 가능
                 self.kiwoom_account.send_price_earning_ratio(constants.ACCOUNT)
+            elif n == 11: # 체결요청
+                self.kiwoom_account.send_conclude_data(constants.SAMSUNG_CODE,"1","0",constants.ACCOUNT)
+            elif n == 12: # 일자별실현손익요청
+                self.kiwoom_account.send_day_earn_data(constants.ACCOUNT, "20230101", "20230531")
 
     def start_test(self):
         # tr 요청
