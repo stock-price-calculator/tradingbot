@@ -20,18 +20,18 @@ class TradingBot():
         while True:
             n = int(input("메뉴번호를 선택하세요 : "))
             if n == 1:  # 시장가 매수
-                buy_order = self.kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
+                buy_order = self.kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.LG_CODE, 1, 0, "시장가")
                 print("결과값 : ", buy_order)
             elif n == 2: # 시장가 매도
-                sell_order = self.kiwoom_trade.send_sell_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
+                sell_order = self.kiwoom_trade.send_sell_order(constants.ACCOUNT, constants.LG_CODE, 1, 0, "시장가")
                 print("결과값 : ", sell_order)
             if n == 3: # 테스트
                 self.start_test()
             elif n == 4: # 예수금
                 self.kiwoom_account.send_detail_account_info(constants.ACCOUNT)
-            elif n == 5: #총수익률
+            elif n == 5: #총수익률 - 총 매입금액, 수익률
                 self.kiwoom_account.send_detail_account_mystock(constants.ACCOUNT)
-            elif n == 6: # 계좌별주문체결내역상세요청
+            elif n == 6: # 계좌별주문체결내역상세요청 - 날짜별 체결내역
                 self.kiwoom_account.send_trading_record(30, constants.ACCOUNT, "1", "0", "")
             elif n == 7: # 주식분봉차트조회요청
                 self.kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
@@ -39,7 +39,7 @@ class TradingBot():
                 self.kiwoom_price.send_day_chart_data(constants.SAMSUNG_CODE, "20230413")
             elif n == 9: # 주식주봉차트조회요청
                 self.kiwoom_price.send_week_chart_data(constants.SAMSUNG_CODE,"20160101","20230413")
-            elif n == 10: # 계좌수익률요청
+            elif n == 10: # 계좌수익률요청 - 보유 주식량 확인 가능
                 self.kiwoom_account.send_price_earning_ratio(constants.ACCOUNT)
 
     def start_test(self):

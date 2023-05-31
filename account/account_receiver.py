@@ -40,15 +40,15 @@ class Kiwoom_Receive_Account:
     def receive_price_earning_ratio(self, sTrCode, sRQName, sRecordName):
 
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
-        print(repeat)
+
         for i in range(repeat):
-            trade_time = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "일자").strip()
-            item_code = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "종목코드").strip()
-            item_name = self.Kiwoom.get_comm_data(sTrCode, sRecordName,0, "종목명").strip()
-            trade_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "현재가").strip()
-            trade_buy_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "매입가").strip()
-            trade_total_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName,0, "매입금액").strip()
-            item_buy_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "보유수량").strip()
+            trade_time = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "일자").strip()
+            item_code = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "종목코드").strip()
+            item_name = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "종목명").strip()
+            trade_price = abs(int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "현재가").strip()))
+            trade_buy_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "매입가").strip()
+            trade_total_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName,i, "매입금액").strip()
+            item_buy_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "보유수량").strip()
 
             view.계좌수익률요청(trade_time, item_code, item_name, trade_price, trade_buy_price, trade_total_price, item_buy_count)
 
