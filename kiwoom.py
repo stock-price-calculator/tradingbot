@@ -10,9 +10,9 @@ from PyQt5.QtCore import QEventLoop
 
 import constants
 from PyQt5.QAxContainer import *
-from account.account_receiver import Kiwoom_Receive_Account
-from market.stick_data_receiver import Kiwoom_Receive_Market_price
-from backtesting.backtest import *
+# from account.account_receiver import Kiwoom_Receive_Account
+# from market.stick_data_receiver import Kiwoom_Receive_Market_price
+# from backtesting.backtest import *
 
 
 
@@ -27,8 +27,8 @@ class Kiwoom:
         self.create_kiwoom_instance()
         self.connect_event()
         self.connect_login() # 로그인 요청
-        self.receive_account = Kiwoom_Receive_Account(self)
-        self.receive_market_price = Kiwoom_Receive_Market_price(self)
+        # self.receive_account = Kiwoom_Receive_Account(self)
+        # self.receive_market_price = Kiwoom_Receive_Market_price(self)
         self.result_list = []
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
@@ -98,46 +98,46 @@ class Kiwoom:
         '''
 
         # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
-
-        if sPrevNext == "2":
-            self.remained_data = True
-        else:
-            self.remained_data = False
-
-        # 예수금 등 조회 하기
-        if sRQName == "예수금상세현황요청":
-            self.receive_account.receive_detail_account_info(sTrCode, sRQName)
-        # 계좌평가 잔고
-        elif sRQName == "계좌평가잔고내역요청":
-            self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
-        # 체결내역
-        elif sRQName == "계좌별주문체결내역상세요청":
-            self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
-        elif sRQName == "주식분봉차트조회요청":
-            data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
-            self.result_list += data_list
-
-            if not self.remained_data:
-                # plot_bollinger_bands(self.result_list)
-                bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
-                self.result_list.clear()
-
-        elif sRQName == "주식일봉차트조회요청":
-            self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
-        elif sRQName == "주식주봉차트조회요청":
-            self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
-        elif sRQName == "계좌수익률요청":
-            self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
-
-        elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
-            print("주문 완료")
-
-        elif sRQName == "체결요청":
-            self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
-
-        elif sRQName == "일자별실현손익요청":
-            self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
-        self.tr_event_loop.exit()
+        #
+        # if sPrevNext == "2":
+        #     self.remained_data = True
+        # else:
+        #     self.remained_data = False
+        #
+        # # 예수금 등 조회 하기
+        # if sRQName == "예수금상세현황요청":
+        #     self.receive_account.receive_detail_account_info(sTrCode, sRQName)
+        # # 계좌평가 잔고
+        # elif sRQName == "계좌평가잔고내역요청":
+        #     self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
+        # # 체결내역
+        # elif sRQName == "계좌별주문체결내역상세요청":
+        #     self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
+        # elif sRQName == "주식분봉차트조회요청":
+        #     data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+        #     self.result_list += data_list
+        #
+        #     if not self.remained_data:
+        #         # plot_bollinger_bands(self.result_list)
+        #         bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
+        #         self.result_list.clear()
+        #
+        # elif sRQName == "주식일봉차트조회요청":
+        #     self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
+        # elif sRQName == "주식주봉차트조회요청":
+        #     self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
+        # elif sRQName == "계좌수익률요청":
+        #     self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
+        #
+        # elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
+        #     print("주문 완료")
+        #
+        # elif sRQName == "체결요청":
+        #     self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
+        #
+        # elif sRQName == "일자별실현손익요청":
+        #     self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
+        # self.tr_event_loop.exit()
 
 
     # tr요청 기본 함수
