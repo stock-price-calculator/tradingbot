@@ -41,6 +41,7 @@ class TradingBot():
                 self.kiwoom_price.send_week_chart_data(constants.SAMSUNG_CODE,"20160101","20230413")
             elif n == 10: # 계좌수익률요청
                 self.kiwoom_account.send_price_earning_ratio(constants.ACCOUNT)
+
     def start_test(self):
         # tr 요청
         name = self.kiwoom.get_master_code_name(constants.SAMSUNG_CODE)

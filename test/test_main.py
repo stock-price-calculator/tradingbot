@@ -37,9 +37,22 @@ class Kiwoom:
         self.create_kiwoom_instance()
         self.connect_event()
         self.connect_login() # 로그인 요청
+        self.SetRealReg("0111", "005930", "10", "0")
 
-        self.SetRealReg("0101", "005930", "10", "0")
+        n = int(input("메뉴번호를 선택하세요 : "))
 
+        if n == 1:
+            self.DisConnectRealData("0111")
+        elif n == 2:
+            self.SetRealRemove("ALL", "ALL")
+        elif n == 3:
+            self.SetRealReg("0111", "005930", "10", "0")
+
+
+
+
+
+        # self.SetRealReg("0101", "8043137211", "9201", "0")
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
         self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
@@ -68,9 +81,9 @@ class Kiwoom:
         self.login_event_loop.exit()
 
 
-
-
+    # 주식체결 받아오기
     def receive_realdata(self, sJongmokCode, sRealType, sRealData):
+
         if sRealType == "주식체결":
             print("-----------------------------------------")
             print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
@@ -84,9 +97,25 @@ class Kiwoom:
             print("저가 : " + self.get_comm_real_data(sJongmokCode, 18))
             print("전일거래량대비 : " + self.get_comm_real_data(sJongmokCode, 26))
             print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
-            print("상한가발생시간 : " + self.get_comm_real_data(sJongmokCode, 567))
-            print("하한가발생시간 : " + self.get_comm_real_data(sJongmokCode, 568))
             print("-----------------------------------------")
+
+        # if sRealType == "잔고":
+        #     print("-----------------------------------------")
+        #     print("계좌번호 : " + self.get_comm_real_data(sJongmokCode, 9201))
+        #     print("종목코드, 업종코드 : " + self.get_comm_real_data(sJongmokCode, 9001))
+        #     print("종목명 : " + self.get_comm_real_data(sJongmokCode, 302))
+        #     print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
+        #     print("보유수량 : " + self.get_comm_real_data(sJongmokCode, 930))
+        #     print("매입단가 : " + self.get_comm_real_data(sJongmokCode, 931))
+        #     print("총매입가 : " + self.get_comm_real_data(sJongmokCode, 932))
+        #     print("주문가능수량 : " + self.get_comm_real_data(sJongmokCode, 933))
+        #     print("당일순매수량 : " + self.get_comm_real_data(sJongmokCode, 945))
+        #     print("매도/매수구분 : " + self.get_comm_real_data(sJongmokCode, 946))
+        #     print("손익율 : " + self.get_comm_real_data(sJongmokCode, 8019))
+        #     print("당일실현손익(유가) : " + self.get_comm_real_data(sJongmokCode, 990))
+        #     print("-----------------------------------------")
+        #
+
 
     def SetRealReg(self, screen_no, code_list, fid_list, real_type):
         self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
@@ -94,6 +123,12 @@ class Kiwoom:
 
     def get_comm_real_data(self, item_code, fid):
         return self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
+
+    def DisConnectRealData(self, screen_no):
+        self.ocx.dynamicCall("DisConnectRealData(QString)", screen_no)
+
+    def SetRealRemove(self,strScrNo, strDelCode):
+        self.ocx.dynamicCall("SetRealRemove(QString, QString", strScrNo, strDelCode)
 
 
 
