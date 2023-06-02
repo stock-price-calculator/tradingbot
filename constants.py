@@ -30,7 +30,7 @@ _constant.CHANGE_SELL = 6
 
 # app.py
 
-_constant.ACCOUNT = "8043137211"
+_constant.ACCOUNT = "8051014511"
 _constant.SAMSUNG_CODE = "005930"
 _constant.LG_CODE ="066570"
 
