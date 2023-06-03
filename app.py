@@ -2,73 +2,65 @@ import sys
 
 from PyQt5.QtWidgets import *
 from flask import Flask, jsonify, g
-
 import constants
 from kiwoom import Kiwoom
+from threading import Thread
+import asyncio
 
 app = Flask(__name__)
 
-@app.route("/buy")
-def buy_stock():
-    # 자동매매 로직에서 매수 작업을 수행하는 함수
-    # ...
-    result = start_test()
-    return jsonify({"result": result})
+kiwoom = None
+@app.route("/")
+def get_root():
+    return jsonify("hello")
 
+# def login_async():
+#     global kiwoom
+#
+#     if not kiwoom:
+#         kiwoom = Kiwoom()
+#     kiwoom.connect_login()  # 비동기적으로 로그인 처리
+#     return jsonify(0)
 
-@app.route("/sell")
-def sell_stock():
-    # 자동매매 로직에서 매도 작업을 수행하는 함수
-    # ...
-
-    return jsonify(3)
-
+# @app.route("/login")
+# def get_login():
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     result = loop.run_until_complete(login_async())
+#     loop.close()
+#     return result
 
 @app.route("/login")
 def get_login():
-    app1 = QApplication(sys.argv)
-    if not app1:
-        app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
+    global kiwoom
 
-    g.kiwoom = Kiwoom()
+    if not kiwoom:
+        kiwoom = Kiwoom()
 
-    if not app1:
-        return jsonify(0)
-    else:
-        return jsonify(1)
+    kiwoom.connect_login()
+
+    return jsonify(0)
 
 
-@app.route("/sell1")
-def start_auto_trading():
-    result = start_test()
-
-    return result
-
-
+@app.route("/test")
 def start_test():
     # tr 요청
-    name = g.kiwoom.get_master_code_name(constants.SAMSUNG_CODE)
-    connectState = g.kiwoom.get_connect_state()
-    lastPrice = g.kiwoom.get_master_last_price(constants.SAMSUNG_CODE)
+    # kiwoom = get_kiwoom()
+    global kiwoom
+    name = kiwoom.get_master_code_name(constants.SAMSUNG_CODE)
 
-    print("연결상태 : %d" % connectState)
-    print("유저정보")
-    print("------------------------------")
-    print("계좌 수 : " + g.kiwoom.get_login_info("ACCOUNT_CNT"))
-    print("계좌 번호 : " + g.kiwoom.get_login_info("ACCNO"))
-    print(g.kiwoom.get_login_info("USER_ID"))
-    print(g.kiwoom.get_login_info("USER_NAME"))
-    print("------------------------------")
-    print(name)
-    print("------------------------------")
-    print("전일가 : %s" % lastPrice)
+    return jsonify(name)
 
-    return name
-
+def run_flask_app():
+    app.run()
 
 if __name__ == "__main__":
-    # 자동매매를 위한 PyQt5 애플리케이션 실행
-    # start_auto_trading()
 
-    # Flask 서버 실행
-    app.run()
+    app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
+    t = Thread(target=run_flask_app)
+    t.daemon = True  # 백그라운드 스레드로 실행
+    t.start()
+    kiwoom = Kiwoom()
+    app1.exec_()
+
+

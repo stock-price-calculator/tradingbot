@@ -6,7 +6,7 @@ import view
 import traceback
 from idlelib.iomenu import errors
 
-from PyQt5.QtCore import QEventLoop
+from PyQt5.QtCore import QEventLoop, QCoreApplication
 
 import constants
 from PyQt5.QAxContainer import *
@@ -26,7 +26,10 @@ class Kiwoom:
         self.create_loop_event()
         self.create_kiwoom_instance()
         self.connect_event()
-        self.connect_login() # 로그인 요청
+
+        self.login_success = False
+        # self.connect_login() # 로그인 요청
+
         # self.receive_account = Kiwoom_Receive_Account(self)
         # self.receive_market_price = Kiwoom_Receive_Market_price(self)
         self.result_list = []
@@ -46,17 +49,31 @@ class Kiwoom:
 
     # 로그인 메서드 호출
     def connect_login(self):
+        # self.ocx.dynamicCall("CommConnect()")
+        # self.login_event_loop.exec_()
+        #
+        # if self.login_success == True:
+        #     return 0
         self.ocx.dynamicCall("CommConnect()")
-        self.login_event_loop.exec_()
+
+        while not self.login_success:
+            QCoreApplication.processEvents()
+            time.sleep(0.2)
+
+        if self.login_success:
+            return 0
 
     # 로그인 성공 여부
     def login_slot(self, err_code):
         if err_code == 0:
             print("로그인에 성공하였습니다.")
+            self.login_success = True
+            self.login_event_loop.exit(1)
         else:
             print("로그인에 실패하였습니다.")
-            sys.exit(0)
-        self.login_event_loop.exit()
+            self.login_event_loop.exit(0)
+        # self.login_event_loop.exit()
+
 
     # 종목코드의 종목명을 반환
     def get_master_code_name(self, code):
