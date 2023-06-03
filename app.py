@@ -1,35 +1,25 @@
 import sys
 
 from PyQt5.QtWidgets import *
-from flask import Flask, jsonify, g
+
+from flask import Flask, jsonify
+from flask_restful import Api, Resource
+
 import constants
 from kiwoom import Kiwoom
 from threading import Thread
-import asyncio
+
+
 
 app = Flask(__name__)
+api = Api(app)
 
 kiwoom = None
 @app.route("/")
 def get_root():
     return jsonify("hello")
 
-# def login_async():
-#     global kiwoom
-#
-#     if not kiwoom:
-#         kiwoom = Kiwoom()
-#     kiwoom.connect_login()  # 비동기적으로 로그인 처리
-#     return jsonify(0)
-
-# @app.route("/login")
-# def get_login():
-#     loop = asyncio.new_event_loop()
-#     asyncio.set_event_loop(loop)
-#     result = loop.run_until_complete(login_async())
-#     loop.close()
-#     return result
-
+# 처음 로그인 요청
 @app.route("/login")
 def get_login():
     global kiwoom
@@ -47,20 +37,39 @@ def start_test():
     # tr 요청
     # kiwoom = get_kiwoom()
     global kiwoom
+
+    if not kiwoom:
+        return jsonify(0)
     name = kiwoom.get_master_code_name(constants.SAMSUNG_CODE)
 
-    return jsonify(name)
+    if not name:
+        return jsonify(0)
+    else:
+        return jsonify(name)
 
 def run_flask_app():
-    app.run()
+    app.run(debug=True)
+
+def run_kiwoom_app():
+    global kiwoom
+
+    app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
+    kiwoom = Kiwoom()
+    app1.exec_()
 
 if __name__ == "__main__":
 
-    app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
-    t = Thread(target=run_flask_app)
-    t.daemon = True  # 백그라운드 스레드로 실행
+    # app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
+    # t = Thread(target=run_flask_app)
+    # t.daemon = True  # 백그라운드 스레드로 실행
+    # t.start()
+    # kiwoom = Kiwoom()
+    # app1.exec_()
+
+    t = Thread(target=run_kiwoom_app)
+    t.daemon = True
     t.start()
-    kiwoom = Kiwoom()
-    app1.exec_()
+
+    run_flask_app()
 
 
