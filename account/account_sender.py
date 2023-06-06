@@ -57,6 +57,10 @@ class Kiwoom_Send_Account:
         Kiwoom.set_input_value(self.Kiwoom, "조회구분", "2")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
 
+        self.wait_result()
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
+
     # 오늘날짜를 기준으로 term기간만큼 날짜 가져오기
 
     # 계좌별주문체결내역상세요청

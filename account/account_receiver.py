@@ -10,7 +10,6 @@ class Kiwoom_Receive_Account:
 
     # 예수금상세현황요청 값 받기
     def receive_detail_account_info(self, sTrCode, sRQName):
-        self.Kiwoom.return_list.clear()
         deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "예수금").strip()
         ok_deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "출금가능금액").strip()
         buy_deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "주문가능금액").strip()
@@ -27,9 +26,18 @@ class Kiwoom_Receive_Account:
 
     # 계좌평가잔고내역요청 값 받기
     def receive_detail_account_mystock(self, sTrCode, sRQName):
+        self.Kiwoom.return_list.clear()  # 결과리스트 초기화
         total_buy_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총매입금액").strip()
         total_profit_loss_rate = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)").strip()
+
+        self.Kiwoom.return_list.append({
+            "총매입금액": total_buy_money,
+            "총수익률(%)": total_profit_loss_rate,
+        })
         view.계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate)
+        self.Kiwoom.data_success = True
+
+
 
     # 계좌별주문체결내역상세요청 값 받기
     def receive_trading_record(self, sTrCode, sRQName, sRecordName):

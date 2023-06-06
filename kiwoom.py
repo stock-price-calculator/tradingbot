@@ -175,7 +175,6 @@ class Kiwoom:
         self.data_success = False
 
 
-
     # tr 반복수 받음
     def get_repeat_cnt(self, trcode, rqname):
         repeat_cnt = self.ocx.dynamicCall("GetRepeatCnt(String, String)", trcode, rqname)
