@@ -36,7 +36,7 @@ class Kiwoom:
 
         self.login_success = False  # loop못사용해서 변수 설정
         self.data_success = False # loop못사용해서 변수 설정
-
+        self.continuous_data_success = False
         self.receive_account = Kiwoom_Receive_Account(self)
         # self.receive_market_price = Kiwoom_Receive_Market_price(self)
         self.result_list = []
@@ -123,7 +123,7 @@ class Kiwoom:
             self.remained_data = True
         else:
             self.remained_data = False
-        #
+
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
             self.receive_account.receive_detail_account_info(sTrCode, sRQName)
@@ -133,16 +133,17 @@ class Kiwoom:
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
             self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
+            self.continuous_data_success = True
         elif sRQName == "계좌수익률요청":
             self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
-        elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
-            print("주문 완료")
-
-        elif sRQName == "체결요청":
-            self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
-
-        elif sRQName == "일자별실현손익요청":
-            self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
+        # elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
+        #     print("주문 완료")
+        #
+        # elif sRQName == "체결요청":
+        #     self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
+        #
+        # elif sRQName == "일자별실현손익요청":
+        #     self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
 
         # elif sRQName == "주식분봉차트조회요청":
         #     data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
@@ -159,7 +160,6 @@ class Kiwoom:
         #     self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
 
         self.tr_event_loop.exit()
-        self.data_success = True
 
 
     # tr요청 기본 함수
@@ -173,6 +173,7 @@ class Kiwoom:
         self.tr_event_loop = QEventLoop()
         self.tr_event_loop.exec_()
         self.data_success = False
+        # self.continuous_data_success = False
 
 
     # tr 반복수 받음

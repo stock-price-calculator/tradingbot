@@ -28,6 +28,13 @@ class Kiwoom_Send_Account:
     def __init__(self, main_kiwoom):
         self.Kiwoom = main_kiwoom
 
+    def wait_continuous_result(self):
+        while not self.Kiwoom.data_success:
+            QCoreApplication.processEvents()
+            time.sleep(0.2)
+            if self.Kiwoom.continuous_data_success:
+                self.Kiwoom.data_success = True
+    # 단일정보 요청 - 예수금. 계좌평가
     def wait_result(self):
         while not self.Kiwoom.data_success:
             QCoreApplication.processEvents()
@@ -44,10 +51,11 @@ class Kiwoom_Send_Account:
         Kiwoom.send_comm_rq_data(self.Kiwoom, "예수금상세현황요청", "opw00001", 0, "2000")
 
         self.wait_result()
+
         if self.Kiwoom.data_success:
             return self.Kiwoom.return_list
 
-    # 계좌평가잔고내역요청
+    # 계좌평가잔고내역요청 - 총수익률
     def send_detail_account_mystock(self, account, sPrevNext="0"):
 
         # sPrevNext="0" : 싱글데이터 받아오기(종목합계 데이터)
@@ -58,6 +66,7 @@ class Kiwoom_Send_Account:
         Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌평가잔고내역요청", "opw00018", sPrevNext, "2000")
 
         self.wait_result()
+
         if self.Kiwoom.data_success:
             return self.Kiwoom.return_list
 
@@ -69,7 +78,7 @@ class Kiwoom_Send_Account:
 
         # term기간만큼 이전날짜 가져옴
         all_date = get_trading_record_date(term)
-
+        
         for day in reversed(all_date):
             Kiwoom.set_input_value(self.Kiwoom, "주문일자", day)
             Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
@@ -82,6 +91,13 @@ class Kiwoom_Send_Account:
             Kiwoom.set_input_value(self.Kiwoom, "시작주문번호", "")
             Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
             time.sleep(0.3)
+
+        self.wait_continuous_result()
+        self.Kiwoom.continuous_data_success = False
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
+
+
 
 
     # 10085 계좌수익률 요청
