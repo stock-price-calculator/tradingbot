@@ -8,13 +8,25 @@ from router.user import user_bp
 from account.account_sender import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
+from flask_restx import Api, Resource, reqparse
 
 app = Flask(__name__)
+
+# api swagger
+api = Api(app, version='1.0', title='API 문서', description='Swagger 문서', doc="/api-docs")
+test_api = api.namespace('test', description='조회 API')
 
 kiwoom = None
 kiwoom_account = None
 kiwoom_trade = None
 kiwoom_price = None
+
+# api swagger
+@test_api.route('/')
+class Test(Resource):
+    def get(self):
+        return 'Hello World!'
+
 
 # 처음 로그인 요청
 @app.route("/login")
@@ -44,14 +56,50 @@ def get_user_data():
     else:
         return jsonify({"id": id, "name" : name, "account" : account})
 
+# 매수주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/buy", methods=['POST'])
 def send_buy_order():
-    # data = request.json
-    # print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+    data = request.get_json()
+    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
     buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.LG_CODE, 1, 0, "시장가")
 
     return jsonify(buy_order)
+
+# 매도주문 계좌번호/종목코드/수량/가격/구매타입
+@app.route("/order/sell", methods=['POST'])
+def send_buy_order():
+    data = request.get_json()
+    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+
+    sell_order =kiwoom_trade.send_sell_order(constants.ACCOUNT, constants.LG_CODE, 1, 0, "시장가")
+
+    return jsonify(sell_order)
+
+# 매수주문 취소
+@app.route("/order/cancel/buy", methods=['POST'])
+def send_buy_order():
+    data = request.get_json()
+    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+
+    cancel_buy_order = kiwoom_trade.cancel_buy_order(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'], data['original_order_num'])
+
+    return jsonify(sell_cancel_order)
+
+# 매도주문 취소
+@app.route("/order/cancel/sell", methods=['POST'])
+def send_buy_order():
+    data = request.get_json()
+    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+
+    cancel_sell_order = kiwoom_trade.cancel_sell_order(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'], data['original_order_num'])
+
+    return jsonify(cancel_sell_order)
+
+
+
+
+
 
 # Flask 서버 실행
 def run_flask_app():
