@@ -38,8 +38,10 @@ def get_login():
     kiwoom.connect_login()
     return jsonify({'result': True})
 
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 # 유저 이름, 계좌, id
-@app.route("/user/data")
+@app.route("/user/info", methods=['GET'])
 def get_user_data():
     global kiwoom
 
@@ -55,6 +57,44 @@ def get_user_data():
         return jsonify({"result" : "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify({"id": id, "name" : name, "account" : account})
+# 예수금
+@app.route("/user/money", methods=['GET'])
+def get_user_money():
+    result = kiwoom_account.send_detail_account_info(constants.ACCOUNT)
+
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result)
+
+# # 총수익률 - 총 매입금액, 수익률
+# @app.route("/user/total_money", methods=['GET'])
+# def get_user_data():
+#
+# # 계좌별주문체결내역상세요청 - 날짜별 체결내역
+# @app.route("/user/total_money", methods=['GET'])
+# def get_user_data():
+#
+#
+# # 계좌수익률요청 - 보유 주식량 확인
+# @app.route("/user/total_money", methods=['GET'])
+# def get_user_data():
+#
+# # 체결요청
+# @app.route("/user/total_money", methods=['GET'])
+# def get_user_data():
+#
+# # 일자별실현손익요청
+# @app.route("/user/total_money", methods=['GET'])
+# def get_user_data():
+#
+
+
+
+
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#매매코드
+
 
 # 매수주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/buy", methods=['POST'])
@@ -68,7 +108,7 @@ def send_buy_order():
 
 # 매도주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/sell", methods=['POST'])
-def send_buy_order():
+def send_sell_order():
     data = request.get_json()
     print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
@@ -78,23 +118,26 @@ def send_buy_order():
 
 # 매수주문 취소
 @app.route("/order/cancel/buy", methods=['POST'])
-def send_buy_order():
+def send_cancel_buy_order():
     data = request.get_json()
     print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
     cancel_buy_order = kiwoom_trade.cancel_buy_order(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'], data['original_order_num'])
 
-    return jsonify(sell_cancel_order)
+    return jsonify(cancel_buy_order)
 
 # 매도주문 취소
 @app.route("/order/cancel/sell", methods=['POST'])
-def send_buy_order():
+def send_cancel_sell_order():
     data = request.get_json()
     print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
     cancel_sell_order = kiwoom_trade.cancel_sell_order(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'], data['original_order_num'])
 
     return jsonify(cancel_sell_order)
+
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 
 
 

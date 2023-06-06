@@ -3,7 +3,7 @@ import time
 
 
 from kiwoom import Kiwoom
-
+from PyQt5.QtCore import QEventLoop, QCoreApplication
 
 # term기간만큼 이전날짜 가져옴
 def get_trading_record_date(term):
@@ -28,7 +28,12 @@ class Kiwoom_Send_Account:
     def __init__(self, main_kiwoom):
         self.Kiwoom = main_kiwoom
 
-    # 요청하는 함수
+    def wait_result(self):
+        while not self.Kiwoom.data_success:
+            QCoreApplication.processEvents()
+            time.sleep(0.2)
+            if self.Kiwoom.return_list:
+                self.Kiwoom.data_success = True
 
     # 예수금상세현황요청
     def send_detail_account_info(self, account):
@@ -37,6 +42,10 @@ class Kiwoom_Send_Account:
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호입력매체구분", "00")
         Kiwoom.set_input_value(self.Kiwoom, "조회구분", "2")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "예수금상세현황요청", "opw00001", 0, "2000")
+
+        self.wait_result()
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
 
     # 계좌평가잔고내역요청
     def send_detail_account_mystock(self, account, sPrevNext="0"):

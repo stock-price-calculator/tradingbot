@@ -1,4 +1,5 @@
 import view.account_view as view
+import json
 
 
 class Kiwoom_Receive_Account:
@@ -6,12 +7,23 @@ class Kiwoom_Receive_Account:
     def __init__(self, main_kiwoom):
         self.Kiwoom = main_kiwoom
 
+
     # 예수금상세현황요청 값 받기
     def receive_detail_account_info(self, sTrCode, sRQName):
+        self.Kiwoom.return_list.clear()
         deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "예수금").strip()
         ok_deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "출금가능금액").strip()
         buy_deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "주문가능금액").strip()
+
+        self.Kiwoom.return_list.append({
+            "예수금" : deposit,
+            "출금가능금액" :ok_deposit,
+            "주문가능금액" :buy_deposit
+        })
         view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
+        self.Kiwoom.data_success = True
+
+
 
     # 계좌평가잔고내역요청 값 받기
     def receive_detail_account_mystock(self, sTrCode, sRQName):

@@ -34,11 +34,14 @@ class Kiwoom:
         self.create_kiwoom_instance()
         self.connect_event()
 
-        self.login_success = False
+        self.login_success = False  # loop못사용해서 변수 설정
+        self.data_success = False # loop못사용해서 변수 설정
 
         self.receive_account = Kiwoom_Receive_Account(self)
         # self.receive_market_price = Kiwoom_Receive_Market_price(self)
         self.result_list = []
+
+        self.return_list = []  #결과값 리턴할 리스트
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
@@ -90,6 +93,7 @@ class Kiwoom:
     # USER_NAME - 사용자명을 반환한다
     # KEY_BSECGB - 키보드보안 해지여부 0:정상 1:해지
     # FIREW_SECGB - 방화벽 설정 여부 0:미설정 1:설정 2:해지
+
     # 사용자 정보 및 계좌 정보
     def get_login_info(self, tag):
         result = self.ocx.dynamicCall("GetLoginInfo(QString)", tag)
@@ -115,10 +119,10 @@ class Kiwoom:
 
         # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
         #
-        # if sPrevNext == "2":
-        #     self.remained_data = True
-        # else:
-        #     self.remained_data = False
+        if sPrevNext == "2":
+            self.remained_data = True
+        else:
+            self.remained_data = False
         #
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
@@ -155,6 +159,7 @@ class Kiwoom:
         #     self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
 
         self.tr_event_loop.exit()
+        self.data_success = True
 
 
     # tr요청 기본 함수
@@ -167,6 +172,9 @@ class Kiwoom:
         self.ocx.dynamicCall("CommRqData(String,String,int,String)", rqname, trcode, next, screen_number)
         self.tr_event_loop = QEventLoop()
         self.tr_event_loop.exec_()
+        self.data_success = False
+
+
 
     # tr 반복수 받음
     def get_repeat_cnt(self, trcode, rqname):
