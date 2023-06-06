@@ -78,9 +78,8 @@ def get_user_total_money():
         return jsonify(result)
 
 
-
 # 계좌별주문체결내역상세요청 - 날짜별 체결내역
-@app.route("/user/account/history", methods=['GET'])
+@app.route("/user/account/record", methods=['GET'])
 def get_user_order_history():
     result = kiwoom_account.send_trading_record(1, constants.ACCOUNT, "1", "0", "")
 
@@ -89,18 +88,33 @@ def get_user_order_history():
     else:
         return jsonify(result)
 
-# # 계좌수익률요청 - 보유 주식량 확인
-# @app.route("/user/total_money", methods=['GET'])
-# def get_user_data():
-#
-# # 체결요청
-# @app.route("/user/total_money", methods=['GET'])
-# def get_user_data():
-#
-# # 일자별실현손익요청
-# @app.route("/user/total_money", methods=['GET'])
-# def get_user_data():
-#
+# 계좌수익률요청 - 보유 주식량 확인
+@app.route("/user/account/pofit11", methods=['GET'])
+def get_user_profit():
+    result = kiwoom_account.send_price_earning_ratio(constants.ACCOUNT)
+
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result)
+
+# 체결요청
+@app.route("/user/account/conclusion", methods=['GET'])
+def get_user_conclusion():
+    result = kiwoom_account.send_conclude_data(constants.SAMSUNG_CODE,"1","0",constants.ACCOUNT)
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result)
+
+# 일자별실현손익요청
+@app.route("/user/account/day-profit", methods=['GET'])
+def get_user_day_profit():
+    result = kiwoom_account.send_day_earn_data(constants.ACCOUNT, "20230101", "20230531")
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result)
 
 
 

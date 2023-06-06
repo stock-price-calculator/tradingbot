@@ -94,16 +94,26 @@ class Kiwoom_Send_Account:
 
         self.wait_continuous_result()
         self.Kiwoom.continuous_data_success = False
+
         if self.Kiwoom.data_success:
             return self.Kiwoom.return_list
 
 
-
-
-    # 10085 계좌수익률 요청
+    # opt10085 계좌수익률 요청
     def send_price_earning_ratio(self,account):
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌수익률요청", "opt10085", 0, "2000")
+
+
+        self.wait_continuous_result()
+        print("탈출함")
+        print(self.Kiwoom.continuous_data_success)
+        print(self.Kiwoom.data_success)
+
+        self.Kiwoom.continuous_data_success = False
+
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
 
     # opt10076 체결요청
     def send_conclude_data(self,item_code, gubun, buy_or_sell, account):
@@ -117,6 +127,11 @@ class Kiwoom_Send_Account:
 
         Kiwoom.send_comm_rq_data(self.Kiwoom, "체결요청", "opt10076", 0, "2000")
 
+        self.wait_continuous_result()
+        self.Kiwoom.continuous_data_success = False
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
+
     # opt10074 일자별실현손익요청
     def send_day_earn_data(self, account, start_day , last_day):
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
@@ -124,3 +139,8 @@ class Kiwoom_Send_Account:
         Kiwoom.set_input_value(self.Kiwoom, "종료일자", last_day)
 
         Kiwoom.send_comm_rq_data(self.Kiwoom, "일자별실현손익요청", "opt10074", 0, "2000")
+
+        self.wait_continuous_result()
+        self.Kiwoom.continuous_data_success = False
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list

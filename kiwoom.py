@@ -136,14 +136,16 @@ class Kiwoom:
             self.continuous_data_success = True
         elif sRQName == "계좌수익률요청":
             self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
-        # elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
-        #     print("주문 완료")
-        #
-        # elif sRQName == "체결요청":
-        #     self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
-        #
-        # elif sRQName == "일자별실현손익요청":
-        #     self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
+            self.continuous_data_success = True
+        elif sRQName == "체결요청":
+            self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
+            self.continuous_data_success = True
+        elif sRQName == "일자별실현손익요청":
+            self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
+            self.continuous_data_success = True
+        elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
+            print("주문 완료")
+
 
         # elif sRQName == "주식분봉차트조회요청":
         #     data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
