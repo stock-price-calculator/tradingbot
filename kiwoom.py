@@ -10,13 +10,20 @@ from PyQt5.QtCore import QEventLoop, QCoreApplication
 
 import constants
 from PyQt5.QAxContainer import *
-# from account.account_receiver import Kiwoom_Receive_Account
+from account.account_receiver import Kiwoom_Receive_Account
 # from market.stick_data_receiver import Kiwoom_Receive_Market_price
 # from backtesting.backtest import *
 
 
 
 class Kiwoom:
+    _instance = None
+    def __new__(cls, *args, **kwargs):
+        # 인스턴스가 없는 경우에만 인스턴스를 생성
+        if not cls._instance:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self):
 
         self.remained_data = False  #차트데이터 요청할때 sPrevNext가 2이면 계속
@@ -28,9 +35,8 @@ class Kiwoom:
         self.connect_event()
 
         self.login_success = False
-        # self.connect_login() # 로그인 요청
 
-        # self.receive_account = Kiwoom_Receive_Account(self)
+        self.receive_account = Kiwoom_Receive_Account(self)
         # self.receive_market_price = Kiwoom_Receive_Market_price(self)
         self.result_list = []
 
@@ -49,11 +55,6 @@ class Kiwoom:
 
     # 로그인 메서드 호출
     def connect_login(self):
-        # self.ocx.dynamicCall("CommConnect()")
-        # self.login_event_loop.exec_()
-        #
-        # if self.login_success == True:
-        #     return 0
         self.ocx.dynamicCall("CommConnect()")
 
         while not self.login_success:
@@ -72,8 +73,6 @@ class Kiwoom:
         else:
             print("로그인에 실패하였습니다.")
             self.login_event_loop.exit(0)
-        # self.login_event_loop.exit()
-
 
     # 종목코드의 종목명을 반환
     def get_master_code_name(self, code):
@@ -121,15 +120,26 @@ class Kiwoom:
         # else:
         #     self.remained_data = False
         #
-        # # 예수금 등 조회 하기
-        # if sRQName == "예수금상세현황요청":
-        #     self.receive_account.receive_detail_account_info(sTrCode, sRQName)
-        # # 계좌평가 잔고
-        # elif sRQName == "계좌평가잔고내역요청":
-        #     self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
-        # # 체결내역
-        # elif sRQName == "계좌별주문체결내역상세요청":
-        #     self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
+        # 예수금 등 조회 하기
+        if sRQName == "예수금상세현황요청":
+            self.receive_account.receive_detail_account_info(sTrCode, sRQName)
+        # 계좌평가 잔고
+        elif sRQName == "계좌평가잔고내역요청":
+            self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
+        # 체결내역
+        elif sRQName == "계좌별주문체결내역상세요청":
+            self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
+        elif sRQName == "계좌수익률요청":
+            self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
+        elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
+            print("주문 완료")
+
+        elif sRQName == "체결요청":
+            self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
+
+        elif sRQName == "일자별실현손익요청":
+            self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
+
         # elif sRQName == "주식분봉차트조회요청":
         #     data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
         #     self.result_list += data_list
@@ -143,18 +153,8 @@ class Kiwoom:
         #     self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
         # elif sRQName == "주식주봉차트조회요청":
         #     self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
-        # elif sRQName == "계좌수익률요청":
-        #     self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
-        #
-        # elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
-        #     print("주문 완료")
-        #
-        # elif sRQName == "체결요청":
-        #     self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
-        #
-        # elif sRQName == "일자별실현손익요청":
-        #     self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
-        # self.tr_event_loop.exit()
+
+        self.tr_event_loop.exit()
 
 
     # tr요청 기본 함수
