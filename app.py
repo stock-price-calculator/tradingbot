@@ -10,8 +10,6 @@ app = Flask(__name__)
 
 kiwoom = None
 
-app.register_blueprint(user_bp)
-
 # 처음 로그인 요청
 @app.route("/login")
 def get_login():
@@ -21,6 +19,36 @@ def get_login():
         kiwoom = Kiwoom()
     kiwoom.connect_login()
     return jsonify({'result': True})
+
+
+# 유저 이름, 계좌, id
+@app.route("/user/data")
+def get_user_data():
+    global kiwoom
+
+    if not kiwoom:
+        return jsonify(0)
+    id = kiwoom.get_login_info("USER_ID")
+    name = kiwoom.get_login_info("USER_NAME")
+    account = kiwoom.get_login_info("ACCNO")
+
+    print(id,name,account)
+
+    if not name and id and account:
+        return jsonify({"result" : "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify({"id": id, "name" : name, "account" : account})
+
+
+
+
+
+
+#####################################################################
+# 매수매도
+
+
+
 
 # Flask 서버 실행
 def run_flask_app():
