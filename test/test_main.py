@@ -37,7 +37,7 @@ class Kiwoom:
         self.create_kiwoom_instance()
         self.connect_event()
         self.connect_login() # 로그인 요청
-        self.SetRealReg("0111", "005930", "10", "0")
+        # self.SetRealReg("0111", "005930", "10", "0")
 
         n = int(input("메뉴번호를 선택하세요 : "))
 

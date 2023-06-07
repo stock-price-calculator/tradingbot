@@ -51,6 +51,7 @@ class Kiwoom:
     def connect_event(self):
         self.ocx.OnEventConnect.connect(self.login_slot)
         self.ocx.OnReceiveTrData.connect(self.receive_trdata)
+        self.ocx.OnReceiveRealData.connect(self.receive_realdata)
 
     # 이벤트 루프 생성
     def create_loop_event(self):
@@ -163,6 +164,40 @@ class Kiwoom:
 
         self.tr_event_loop.exit()
 
+    # 실시간 데이터 받아오기
+    def receive_realdata(self, sJongmokCode, sRealType, sRealData):
+
+        if sRealType == "주식체결":
+            print("-----------------------------------------")
+            print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
+            print("전일대비 : " + self.get_comm_real_data(sJongmokCode, 11))
+            print("등락율 : " + self.get_comm_real_data(sJongmokCode, 12))
+            print("매도호가 : " + self.get_comm_real_data(sJongmokCode, 27))
+            print("매수호가 : " + self.get_comm_real_data(sJongmokCode, 28))
+            print("누적거래량 : " + self.get_comm_real_data(sJongmokCode, 13))
+            print("시가 : " + self.get_comm_real_data(sJongmokCode, 16))
+            print("고가 : " + self.get_comm_real_data(sJongmokCode, 17))
+            print("저가 : " + self.get_comm_real_data(sJongmokCode, 18))
+            print("전일거래량대비 : " + self.get_comm_real_data(sJongmokCode, 26))
+            print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
+            print("-----------------------------------------")
+
+        # if sRealType == "잔고":
+        #     print("-----------------------------------------")
+        #     print("계좌번호 : " + self.get_comm_real_data(sJongmokCode, 9201))
+        #     print("종목코드, 업종코드 : " + self.get_comm_real_data(sJongmokCode, 9001))
+        #     print("종목명 : " + self.get_comm_real_data(sJongmokCode, 302))
+        #     print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
+        #     print("보유수량 : " + self.get_comm_real_data(sJongmokCode, 930))
+        #     print("매입단가 : " + self.get_comm_real_data(sJongmokCode, 931))
+        #     print("총매입가 : " + self.get_comm_real_data(sJongmokCode, 932))
+        #     print("주문가능수량 : " + self.get_comm_real_data(sJongmokCode, 933))
+        #     print("당일순매수량 : " + self.get_comm_real_data(sJongmokCode, 945))
+        #     print("매도/매수구분 : " + self.get_comm_real_data(sJongmokCode, 946))
+        #     print("손익율 : " + self.get_comm_real_data(sJongmokCode, 8019))
+        #     print("당일실현손익(유가) : " + self.get_comm_real_data(sJongmokCode, 990))
+        #     print("-----------------------------------------")
+        #
 
     # tr요청 기본 함수
     # tr 데이터 정보 입력
@@ -197,3 +232,13 @@ class Kiwoom:
     def get_comm_data(self, trcode, record_name, next, rqname):
         comm_data = self.ocx.dynamicCall("GetCommData(String, String, int, String)", trcode, record_name, next, rqname)
         return comm_data
+
+    def get_comm_real_data(self, item_code, fid):
+
+        print(self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid))
+        return self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
+
+    # 실시간 요청 등록
+    def SetRealReg(self, screen_no, code_list, fid_list, real_type):
+        self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
+                             screen_no, code_list, fid_list, real_type)

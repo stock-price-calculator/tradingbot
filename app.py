@@ -3,12 +3,13 @@ from PyQt5.QtWidgets import *
 from flask import Flask, jsonify, request
 import constants
 from kiwoom import Kiwoom
-from threading import Thread
+from threading import Thread, Event
 from router.user import user_bp
 from account.account_sender import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
 from flask_restx import Api, Resource, reqparse
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 
@@ -20,6 +21,9 @@ kiwoom = None
 kiwoom_account = None
 kiwoom_trade = None
 kiwoom_price = None
+
+stop_event = Event()
+socketio = SocketIO(app)
 
 # api swagger
 @test_api.route('/')
@@ -165,7 +169,23 @@ def send_cancel_sell_order():
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+# 실시간 값 받아오기
+@socketio.on('connect', namespace='/realtime')
+def get_realtime_data():
+    global kiwoom
 
+    kiwoom.SetRealReg("0001", "005930", "20;10", "0")  # Register for real-time data
+
+    while not stop_event.is_set():
+        data = kiwoom.get_comm_real_data("005930", 10)  # Retrieve the real-time data
+
+        socketio.emit('realtime_data',data , namespace='/realtime')
+    return 'Real-time data streaming has stopped.'
+
+@app.route('/stop_realtime_data', methods=['POST'])
+def stop_realtime_data():
+    stop_event.set()
+    return 'Real-time data streaming will be stopped.'
 
 
 
@@ -173,7 +193,9 @@ def send_cancel_sell_order():
 
 # Flask 서버 실행
 def run_flask_app():
-    app.run(debug=True)
+    socketio.init_app(app)
+    # app.run(debug=True)
+    socketio.run(app, debug=True)
 
 # Kiwoom 서버 실행
 def run_kiwoom_app():
