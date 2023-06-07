@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import constants
 from kiwoom import Kiwoom
 from threading import Thread, Event
@@ -32,6 +32,9 @@ class Test(Resource):
         return 'Hello World!'
 
 
+@app.route("/test")
+def index():
+    return render_template('index.html')
 # 처음 로그인 요청
 @app.route("/login")
 def get_login():
@@ -170,17 +173,29 @@ def send_cancel_sell_order():
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # 실시간 값 받아오기
-@socketio.on('connect', namespace='/realtime')
-def get_realtime_data():
-    global kiwoom
+# @socketio.on('connect', namespace='/realtime')
+# def get_realtime_data():
+#     global kiwoom
+#
+#     kiwoom.SetRealReg("0001", "005930", "20;10", "0")  # Register for real-time data
+#
+#     while not stop_event.is_set():
+#         data = kiwoom.get_comm_real_data("005930", 10)  # Retrieve the real-time data
+#
+#         socketio.emit('realtime_data',data , namespace='/realtime')
+#     return 'Real-time data streaming has stopped.'
 
-    kiwoom.SetRealReg("0001", "005930", "20;10", "0")  # Register for real-time data
 
-    while not stop_event.is_set():
-        data = kiwoom.get_comm_real_data("005930", 10)  # Retrieve the real-time data
 
-        socketio.emit('realtime_data',data , namespace='/realtime')
-    return 'Real-time data streaming has stopped.'
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+    emit('server_message', 'You are connected')  # Send a message to the client
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
 
 @app.route('/stop_realtime_data', methods=['POST'])
 def stop_realtime_data():
@@ -193,7 +208,7 @@ def stop_realtime_data():
 
 # Flask 서버 실행
 def run_flask_app():
-    socketio.init_app(app)
+    # socketio.init_app(app)
     # app.run(debug=True)
     socketio.run(app, debug=True)
 
