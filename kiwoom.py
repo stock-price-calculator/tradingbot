@@ -11,8 +11,8 @@ from PyQt5.QtCore import QEventLoop, QCoreApplication
 import constants
 from PyQt5.QAxContainer import *
 from account.account_receiver import Kiwoom_Receive_Account
-# from market.stick_data_receiver import Kiwoom_Receive_Market_price
-# from backtesting.backtest import *
+from market.stick_data_receiver import Kiwoom_Receive_Market_price
+from backtesting.backtest import Kiwoom_BackTesting
 
 
 
@@ -38,7 +38,8 @@ class Kiwoom:
         self.data_success = False # loop못사용해서 변수 설정
         self.continuous_data_success = False
         self.receive_account = Kiwoom_Receive_Account(self)
-        # self.receive_market_price = Kiwoom_Receive_Market_price(self)
+        self.receive_market_price = Kiwoom_Receive_Market_price(self)
+        self.receive_backtest = Kiwoom_BackTesting(self)
         self.result_list = []
 
         self.return_list = []  #결과값 리턴할 리스트
@@ -51,7 +52,7 @@ class Kiwoom:
     def connect_event(self):
         self.ocx.OnEventConnect.connect(self.login_slot)
         self.ocx.OnReceiveTrData.connect(self.receive_trdata)
-        self.ocx.OnReceiveRealData.connect(self.receive_realdata)
+        # self.ocx.OnReceiveRealData.connect(self.receive_realdata)
 
     # 이벤트 루프 생성
     def create_loop_event(self):
@@ -146,17 +147,19 @@ class Kiwoom:
             self.continuous_data_success = True
         elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
             print("주문 완료")
+        elif sRQName == "주식분봉차트조회요청":
+            data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+            self.return_list += data_list
+            print(len(self.return_list))
 
+            if not self.remained_data:
+                print(self.return_list)
+                print("남은 데이터가 없어졌당")
+                time.sleep(0.5)
+                self.continuous_data_success = True
+                # self.receive_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
+                # self.result_list.clear()
 
-        # elif sRQName == "주식분봉차트조회요청":
-        #     data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
-        #     self.result_list += data_list
-        #
-        #     if not self.remained_data:
-        #         # plot_bollinger_bands(self.result_list)
-        #         bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
-        #         self.result_list.clear()
-        #
         # elif sRQName == "주식일봉차트조회요청":
         #     self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
         # elif sRQName == "주식주봉차트조회요청":
@@ -235,7 +238,6 @@ class Kiwoom:
 
     def get_comm_real_data(self, item_code, fid):
 
-        print(self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid))
         return self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
 
     # 실시간 요청 등록

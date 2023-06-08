@@ -1,4 +1,6 @@
 import sys
+
+
 from PyQt5.QtWidgets import *
 from flask import Flask, jsonify, request, render_template
 import constants
@@ -22,8 +24,7 @@ kiwoom_account = None
 kiwoom_trade = None
 kiwoom_price = None
 
-stop_event = Event()
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
 
 # api swagger
 @test_api.route('/')
@@ -171,46 +172,30 @@ def send_cancel_sell_order():
     return jsonify(cancel_sell_order)
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# 백테스팅 코드
+@app.route("/backtest/minutes", methods=['GET'])
+def send_minute_backtest():
 
-# 실시간 값 받아오기
-# @socketio.on('connect', namespace='/realtime')
-# def get_realtime_data():
-#     global kiwoom
-#
-#     kiwoom.SetRealReg("0001", "005930", "20;10", "0")  # Register for real-time data
-#
-#     while not stop_event.is_set():
-#         data = kiwoom.get_comm_real_data("005930", 10)  # Retrieve the real-time data
-#
-#         socketio.emit('realtime_data',data , namespace='/realtime')
-#     return 'Real-time data streaming has stopped.'
+    if not kiwoom:
+        return jsonify(123)
+    result = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result)
 
 
 
-@socketio.on('connect')
-def handle_connect():
-    print('Client connected')
-    emit('server_message', 'You are connected')  # Send a message to the client
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('Client disconnected')
-
-
-@app.route('/stop_realtime_data', methods=['POST'])
-def stop_realtime_data():
-    stop_event.set()
-    return 'Real-time data streaming will be stopped.'
-
-
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# 실시간 매매
 
 
 
 # Flask 서버 실행
 def run_flask_app():
     # socketio.init_app(app)
-    # app.run(debug=True)
-    socketio.run(app, debug=True)
+    app.run(debug=True)
+    # socketio.run(app, debug=True)
 
 # Kiwoom 서버 실행
 def run_kiwoom_app():
@@ -243,18 +228,4 @@ if __name__ == "__main__":
     run_flask_app()
 
 
-@app.route("/test")
-def start_test():
-    # tr 요청
-    # kiwoom = get_kiwoom()
-    global kiwoom
-
-    if not kiwoom:
-        return jsonify(0)
-    name = kiwoom.get_master_code_name(constants.SAMSUNG_CODE)
-
-    if not name:
-        return jsonify(0)
-    else:
-        return jsonify(name)
 

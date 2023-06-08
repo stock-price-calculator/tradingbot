@@ -2,6 +2,7 @@ import view.market_view as view
 from datetime import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
+from PyQt5.QtCore import QEventLoop, QCoreApplication
 
 class Kiwoom_Receive_Market_price:
 

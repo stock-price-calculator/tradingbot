@@ -55,3 +55,47 @@ def handle_disconnect():
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
+
+
+
+# main에서 소켓연결하는 코드
+    # # 실시간 값 받아오기
+    # # @socketio.on('connect', namespace='/realtime')
+    # # def get_realtime_data():
+    # #     global kiwoom
+    # #
+    # #     kiwoom.SetRealReg("0001", "005930", "20;10", "0")  # Register for real-time data
+    # #
+    # #     while not stop_event.is_set():
+    # #         data = kiwoom.get_comm_real_data("005930", 10)  # Retrieve the real-time data
+    # #
+    # #         socketio.emit('realtime_data',data , namespace='/realtime')
+    # #     return 'Real-time data streaming has stopped.'
+    #
+    # @socketio.on('connect')
+    # def handle_connect():
+    #     global kiwoom
+    #
+    #     print('Client connected')
+    #
+    #     kiwoom.SetRealReg("0001", "005930", "20;10", "0")  # Register for real-time data
+    #     while not stop_event.is_set():
+    #         data = kiwoom.get_comm_real_data("005930", 10)  # Retrieve the real-time data
+    #         print("현재가 : " + data)
+    #         socketio.emit('server_message', data)
+    #
+    #     # emit('server_message', 'You are connected')  # Send a message to the client
+    #
+    #
+    # @socketio.on('disconnect')
+    # def handle_disconnect():
+    #     stop_event.set()
+    #     print('Client disconnected')
+    #
+    #
+    # @app.route('/stop_realtime_data', methods=['POST'])
+    # def stop_realtime_data():
+    #     stop_event.set()
+    #     return 'Real-time data streaming will be stopped.'
+    #
+
