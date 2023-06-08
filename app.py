@@ -10,6 +10,7 @@ from router.user import user_bp
 from account.account_sender import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
+from backtesting.backtest import Kiwoom_BackTesting
 from flask_restx import Api, Resource, reqparse
 from flask_socketio import SocketIO, emit
 
@@ -23,6 +24,7 @@ kiwoom = None
 kiwoom_account = None
 kiwoom_trade = None
 kiwoom_price = None
+kiwoom_backtest = None
 
 # socketio = SocketIO(app)
 
@@ -176,9 +178,9 @@ def send_cancel_sell_order():
 @app.route("/backtest/minutes", methods=['GET'])
 def send_minute_backtest():
 
-    if not kiwoom:
-        return jsonify(123)
-    result = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
+    data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
+
+    result = kiwoom_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, data, 1.02, 0.982)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -203,12 +205,14 @@ def run_kiwoom_app():
     global kiwoom_account
     global kiwoom_trade
     global kiwoom_price
+    global kiwoom_backtest
 
     app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
     kiwoom = Kiwoom()
     kiwoom_account = Kiwoom_Send_Account(kiwoom)
     kiwoom_trade = Kiwoom_Trade(kiwoom)
     kiwoom_price = Kiwoom_Price(kiwoom)
+    kiwoom_backtest = Kiwoom_BackTesting(kiwoom)
     app1.exec_()
 
 

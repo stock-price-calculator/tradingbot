@@ -30,22 +30,15 @@ class Kiwoom_Price:
         Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "주식분봉차트조회요청", "opt10080", 0, "2000")
 
-        print("요청보냈어요!")
-        print(self.Kiwoom.remained_data)
         while self.Kiwoom.remained_data:
             time.sleep(0.2)
             Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
             Kiwoom.set_input_value(self.Kiwoom, "틱범위", minute_type)
             Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
             Kiwoom.send_comm_rq_data(self.Kiwoom, "주식분봉차트조회요청", "opt10080", "2", "2000")
-            print("남은 데이터 있어서 요청 더함")
-
-        print("요청을 다보냄!!!!!!!!!!!!!!!!")
 
         self.wait_continuous_result()
         self.Kiwoom.continuous_data_success = False
-
-        print(self.Kiwoom.return_list)
 
         if self.Kiwoom.data_success:
             return self.Kiwoom.return_list
