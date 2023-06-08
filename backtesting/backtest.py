@@ -90,18 +90,7 @@ class Kiwoom_BackTesting:
                 if sell_price - buy_price > 0:
                     win_count += 1
         view.bollinger_backtesting_result(item_code, time_type, per, myasset, count, win_count)
-        # self.Kiwoom.return_list.append({
-        #     "종목코드": item_code,
-        #     "거래막대 타입": time_type,
-        #     "퍼센트": per,
-        #     "내자산": myasset,
-        #     "거래 수": count,
-        #     "이득": win_count,
-        #     "손해" : count - win_count,
-        # })
-        #
-        # self.Kiwoom.data_success = True
-        # self.Kiwoom.continuous_data_success = True
+
         return {
             "종목코드": item_code,
             "거래막대 타입": time_type,

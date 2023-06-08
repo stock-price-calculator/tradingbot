@@ -11,6 +11,7 @@ from account.account_sender import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
 from backtesting.backtest import Kiwoom_BackTesting
+from realtime.trading import Kiwoom_Real_trade
 from flask_restx import Api, Resource, reqparse
 from flask_socketio import SocketIO, emit
 
@@ -25,6 +26,7 @@ kiwoom_account = None
 kiwoom_trade = None
 kiwoom_price = None
 kiwoom_backtest = None
+kiwoom_real_trading = None
 
 # socketio = SocketIO(app)
 
@@ -191,7 +193,19 @@ def send_minute_backtest():
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # 실시간 매매
 
+@app.route("/real_trading_start/", methods=['GET'])
+def start_real_trading():
 
+    kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")  # Set up real-time data subscription
+
+    return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+
+@app.route("/real_trading_stop/", methods=['GET'])
+def stop_real_trading():
+
+    kiwoom_real_trading.stop_real_trading()  # Set up real-time data subscription
+
+    return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
 # Flask 서버 실행
 def run_flask_app():
@@ -206,6 +220,7 @@ def run_kiwoom_app():
     global kiwoom_trade
     global kiwoom_price
     global kiwoom_backtest
+    global kiwoom_real_trading
 
     app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
     kiwoom = Kiwoom()
@@ -213,6 +228,7 @@ def run_kiwoom_app():
     kiwoom_trade = Kiwoom_Trade(kiwoom)
     kiwoom_price = Kiwoom_Price(kiwoom)
     kiwoom_backtest = Kiwoom_BackTesting(kiwoom)
+    kiwoom_real_trading = Kiwoom_Real_trade(kiwoom)
     app1.exec_()
 
 
