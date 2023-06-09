@@ -90,10 +90,19 @@ def get_user_total_money():
         return jsonify(result)
 
 
-# 계좌별주문체결내역상세요청 - 날짜별 체결내역
-@app.route("/user/account/record", methods=['GET'])
+# 계좌별주문체결내역상세요청 - 날짜별 체결내역 opw00007
+@app.route("/user/account/record", methods=['POST'])
 def get_user_order_history():
-    result = kiwoom_account.send_trading_record(1, constants.ACCOUNT, "1", "0", "")
+    # 지금기점으로 가져올 기간 / 계좌번호  / 0: 전체 1:매도 2:매수 /종목코드 : 비우면 전체
+    # result = kiwoom_account.send_trading_record(1, constants.ACCOUNT, "1", "0", "")
+    data = request.get_json()
+
+    term = data['term']
+    account = data['account']
+    buy_or_sell = data['buy_or_sell']
+    item_code = data['item_code']
+
+    result = kiwoom_account.send_trading_record(term, constants.ACCOUNT, "1", buy_or_sell, item_code)
 
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
@@ -113,6 +122,7 @@ def get_user_profit():
 # 체결요청
 @app.route("/user/account/conclusion", methods=['GET'])
 def get_user_conclusion():
+
     result = kiwoom_account.send_conclude_data(constants.SAMSUNG_CODE,"1","0",constants.ACCOUNT)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
@@ -120,9 +130,15 @@ def get_user_conclusion():
         return jsonify(result)
 
 # 일자별실현손익요청
-@app.route("/user/account/day-profit", methods=['GET'])
+@app.route("/user/account/day-profit", methods=['POST'])
 def get_user_day_profit():
-    result = kiwoom_account.send_day_earn_data(constants.ACCOUNT, "20230606", "20230609")
+
+    data = request.get_json()
+
+    start_day = data['start_day']
+    last_day = data['last_day']
+
+    result = kiwoom_account.send_day_earn_data(constants.ACCOUNT, start_day, last_day)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -134,24 +150,36 @@ def get_user_day_profit():
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #매매코드
 
-
 # 매수주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/buy", methods=['POST'])
 def send_buy_order():
-    # data = request.get_json()
-    # print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
-    buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
+    # 계좌 / 종목코드 / 수량 / 가격(시장가 = 0) / "지정가", "시장가"
+    # buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
+    data = request.get_json()
+
+    item_code = data['item_code']
+    quantity = data['quantity']
+    price = data['price']
+    trading_type = data['trading_type']
+
+    buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, item_code, quantity, price, trading_type)
 
     return jsonify(buy_order)
 
 # 매도주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/sell", methods=['POST'])
 def send_sell_order():
-    # data = request.get_json()
-    # print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
-    sell_order =kiwoom_trade.send_sell_order(constants.ACCOUNT, constants.LG_CODE, 1, 0, "시장가")
+    # 계좌 / 종목코드 / 수량 / 가격(시장가 = 0) / "지정가", "시장가"
+    # buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
+    data = request.get_json()
+
+    item_code = data['item_code']
+    quantity = data['quantity']
+    price = data['price']
+    trading_type = data['trading_type']
+    sell_order =kiwoom_trade.send_sell_order(constants.ACCOUNT, item_code, quantity, price, trading_type)
 
     return jsonify(sell_order)
 

@@ -45,6 +45,8 @@ class Kiwoom_Send_Account:
 
     # 예수금상세현황요청
     def send_detail_account_info(self, account):
+        self.Kiwoom.return_list.clear()
+
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호", "0000")
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호입력매체구분", "00")
@@ -58,6 +60,7 @@ class Kiwoom_Send_Account:
 
     # 계좌평가잔고내역요청 - 총수익률
     def send_detail_account_mystock(self, account, sPrevNext="2"):
+        self.Kiwoom.return_list.clear()  # 결과리스트 초기화
 
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호", "0000")
@@ -78,6 +81,7 @@ class Kiwoom_Send_Account:
     def send_trading_record(self, term, account, find_division, buy_or_sell, item_code):
         print("체결내역 서버에 요청")
 
+        self.Kiwoom.return_list.clear()
         # term기간만큼 이전날짜 가져옴
         all_date = get_trading_record_date(term)
 
@@ -92,8 +96,8 @@ class Kiwoom_Send_Account:
             Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
             Kiwoom.set_input_value(self.Kiwoom, "시작주문번호", "")
             Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
-            time.sleep(0.3)
-
+            time.sleep(0.2)
+        time.sleep(0.5)
         self.wait_continuous_result()
         self.Kiwoom.continuous_data_success = False
 
@@ -102,6 +106,8 @@ class Kiwoom_Send_Account:
 
     # opt10085 계좌수익률 요청
     def send_price_earning_ratio(self, account):
+        self.Kiwoom.return_list.clear()  # 결과리스트 초기화
+
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌수익률요청", "opt10085", 0, "2000")
 
@@ -114,6 +120,8 @@ class Kiwoom_Send_Account:
 
     # opt10076 체결요청
     def send_conclude_data(self, item_code, gubun, buy_or_sell, account):
+        self.Kiwoom.return_list.clear()  # 결과리스트 초기화
+
         Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
         Kiwoom.set_input_value(self.Kiwoom, "조회구분", gubun)
         Kiwoom.set_input_value(self.Kiwoom, "매도수구분", buy_or_sell)
@@ -131,6 +139,8 @@ class Kiwoom_Send_Account:
 
     # opt10074 일자별실현손익요청
     def send_day_earn_data(self, account, start_day, last_day):
+        self.Kiwoom.return_list.clear()  # 결과리스트 초기화
+
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.set_input_value(self.Kiwoom, "시작일자", start_day)
         Kiwoom.set_input_value(self.Kiwoom, "종료일자", last_day)
