@@ -13,8 +13,11 @@ from backtesting.backtest import Kiwoom_BackTesting
 from realtime.trading import Kiwoom_Real_trade
 from flask_restx import Api, Resource, reqparse
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app,  resources={r"/*": {"origins": "*"}})
 
 # api swagger
 api = Api(app, version='1.0', title='API 문서', description='Swagger 문서', doc="/api-docs")
@@ -229,6 +232,7 @@ def send_item_list():
     else:
         return jsonify(result_name)
 
+# 주식 기본정보
 @app.route("/market/information", methods=['POST'])
 def send_item_information():
     data = request.get_json()
@@ -260,14 +264,14 @@ def send_minute_backtest():
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # 실시간 매매
 
-@app.route("/real_trading_start/", methods=['GET'])
+@app.route("/real_trading_start", methods=['GET'])
 def start_real_trading():
     kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")  # Set up real-time data subscription
 
     return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
 
-@app.route("/real_trading_stop/", methods=['GET'])
+@app.route("/real_trading_stop", methods=['GET'])
 def stop_real_trading():
     kiwoom_real_trading.stop_real_trading()  # Set up real-time data subscription
 

@@ -88,7 +88,6 @@ class Kiwoom_Price:
             # print(code_name)
             if code_name == item_name:
                 return code
-            print("종목명",code_name,"종목코드",code)
 
         return 0
 
