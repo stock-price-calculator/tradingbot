@@ -101,11 +101,6 @@ class Kiwoom:
         result = self.ocx.dynamicCall("GetLoginInfo(QString)", tag)
         return result
 
-    # 전일가
-    def get_master_last_price(self, code):
-        result = self.ocx.dynamicCall("GetMasterLastPrice(QString)", code)
-        return result
-
     # 요청한 tr값 수신
     def receive_trdata(self, sScrNo, sRQName, sTrCode, sRecordName, sPrevNext):
 
@@ -186,23 +181,6 @@ class Kiwoom:
             print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
             print("-----------------------------------------")
 
-        # if sRealType == "잔고":
-        #     print("-----------------------------------------")
-        #     print("계좌번호 : " + self.get_comm_real_data(sJongmokCode, 9201))
-        #     print("종목코드, 업종코드 : " + self.get_comm_real_data(sJongmokCode, 9001))
-        #     print("종목명 : " + self.get_comm_real_data(sJongmokCode, 302))
-        #     print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
-        #     print("보유수량 : " + self.get_comm_real_data(sJongmokCode, 930))
-        #     print("매입단가 : " + self.get_comm_real_data(sJongmokCode, 931))
-        #     print("총매입가 : " + self.get_comm_real_data(sJongmokCode, 932))
-        #     print("주문가능수량 : " + self.get_comm_real_data(sJongmokCode, 933))
-        #     print("당일순매수량 : " + self.get_comm_real_data(sJongmokCode, 945))
-        #     print("매도/매수구분 : " + self.get_comm_real_data(sJongmokCode, 946))
-        #     print("손익율 : " + self.get_comm_real_data(sJongmokCode, 8019))
-        #     print("당일실현손익(유가) : " + self.get_comm_real_data(sJongmokCode, 990))
-        #     print("-----------------------------------------")
-        #
-
     # tr요청 기본 함수
     # tr 데이터 정보 입력
     def set_input_value(self, id, value):
@@ -233,12 +211,33 @@ class Kiwoom:
         self.tr_event_loop.exec_()
         return trade_data
 
+    # 시장종목 리스트를 가져오기 (종목코드 가져오기)
+    def GetCodeListByMarket(self,market):
+        item_code_list = self.ocx.dynamicCall("GetCodeListByMarket(QString)",market)
+
+        return item_code_list
+
+    def GetMarsterCodeName(self, item_code):
+        item_name = self.ocx.dynamicCall("GetMasterCodeName(QString)", item_code)
+
+        return item_name
+
+    # def get_item_code(self, item_name):
+    #     code_list = self.ocx.dynamicCall("GetCodeListByMarket("0"))  # "0" for KOSPI market, "10" for KOSDAQ market
+    #     print(code_list)
+    #     for code in code_list:
+    #         name = self.GetMasterCodeName(code)
+    #         if name == item_name:
+    #             return code
+    #
+    #     return None  # Return None if the item name is not found
+
     def get_comm_data(self, trcode, record_name, next, rqname):
         comm_data = self.ocx.dynamicCall("GetCommData(String, String, int, String)", trcode, record_name, next, rqname)
         return comm_data
 
+    # 실시간
     def get_comm_real_data(self, item_code, fid):
-
         return self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
 
     # 실시간 요청 등록

@@ -95,7 +95,7 @@ class Kiwoom_Receive_Account:
             trade_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "체결단가").strip()
             order_type = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "매매구분").strip()
 
-            if order_number != "" or order_number is not None:
+            if order_number != "" and order_number is not None:
                 view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_time, trade_count, trade_price,
                                      order_type)
                 self.Kiwoom.return_list.append({
@@ -123,7 +123,7 @@ class Kiwoom_Receive_Account:
             trade_total_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName,i, "매입금액").strip()
             item_buy_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "보유수량").strip()
 
-            if trade_time != "" or trade_time is not None:
+            if trade_time != "" and trade_time is not None:
                 view.계좌수익률요청(trade_time, item_code, item_name, trade_price, trade_buy_price, trade_total_price, item_buy_count)
                 self.Kiwoom.return_list.append({
                     "일자": trade_time,
@@ -184,7 +184,7 @@ class Kiwoom_Receive_Account:
             day_trade_charge = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "당일매매수수료").strip()
             day_trade_tax = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "당일매매세금").strip()
 
-            if date != "" or date is not None:
+            if date != "" and date is not None:
                 list =[]
 
                 list.append({

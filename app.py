@@ -1,6 +1,5 @@
 import sys
 
-
 from PyQt5.QtWidgets import *
 from flask import Flask, jsonify, request, render_template
 import constants
@@ -28,6 +27,7 @@ kiwoom_price = None
 kiwoom_backtest = None
 kiwoom_real_trading = None
 
+
 # socketio = SocketIO(app)
 
 # api swagger
@@ -40,6 +40,8 @@ class Test(Resource):
 @app.route("/test")
 def index():
     return render_template('index.html')
+
+
 # 처음 로그인 요청
 @app.route("/login")
 def get_login():
@@ -50,7 +52,8 @@ def get_login():
     kiwoom.connect_login()
     return jsonify({'result': True})
 
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # 유저 이름, 계좌, id
 @app.route("/user/info", methods=['GET'])
@@ -63,12 +66,14 @@ def get_user_data():
     name = kiwoom.get_login_info("USER_NAME")
     account = kiwoom.get_login_info("ACCNO")
 
-    print(id,name,account)
+    print(id, name, account)
 
     if not name and id and account:
-        return jsonify({"result" : "정보를 불러오는데 실패했습니다."})
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
-        return jsonify({"id": id, "name" : name, "account" : account})
+        return jsonify({"id": id, "name": name, "account": account})
+
+
 # 예수금
 @app.route("/user/account/info", methods=['GET'])
 def get_user_money():
@@ -78,6 +83,7 @@ def get_user_money():
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result)
+
 
 # 계좌평가잔고내역요청 - 총수익률,총 매입금액, 수익률
 @app.route("/user/account/mystock", methods=['GET'])
@@ -109,6 +115,7 @@ def get_user_order_history():
     else:
         return jsonify(result)
 
+
 # 계좌수익률요청 - 보유 주식량 확인
 @app.route("/user/account/profit", methods=['GET'])
 def get_user_profit():
@@ -122,17 +129,16 @@ def get_user_profit():
 # 체결요청
 @app.route("/user/account/conclusion", methods=['GET'])
 def get_user_conclusion():
-
-    result = kiwoom_account.send_conclude_data(constants.SAMSUNG_CODE,"1","0",constants.ACCOUNT)
+    result = kiwoom_account.send_conclude_data(constants.SAMSUNG_CODE, "1", "0", constants.ACCOUNT)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result)
 
+
 # 일자별실현손익요청
 @app.route("/user/account/day-profit", methods=['POST'])
 def get_user_day_profit():
-
     data = request.get_json()
 
     start_day = data['start_day']
@@ -145,15 +151,12 @@ def get_user_day_profit():
         return jsonify(result)
 
 
-
-
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#매매코드
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# 매매코드
 
 # 매수주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/buy", methods=['POST'])
 def send_buy_order():
-
     # 계좌 / 종목코드 / 수량 / 가격(시장가 = 0) / "지정가", "시장가"
     # buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
     data = request.get_json()
@@ -167,10 +170,10 @@ def send_buy_order():
 
     return jsonify(buy_order)
 
+
 # 매도주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/sell", methods=['POST'])
 def send_sell_order():
-
     # 계좌 / 종목코드 / 수량 / 가격(시장가 = 0) / "지정가", "시장가"
     # buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
     data = request.get_json()
@@ -179,35 +182,57 @@ def send_sell_order():
     quantity = data['quantity']
     price = data['price']
     trading_type = data['trading_type']
-    sell_order =kiwoom_trade.send_sell_order(constants.ACCOUNT, item_code, quantity, price, trading_type)
+    sell_order = kiwoom_trade.send_sell_order(constants.ACCOUNT, item_code, quantity, price, trading_type)
 
     return jsonify(sell_order)
+
 
 # 매수주문 취소
 @app.route("/order/cancel/buy", methods=['POST'])
 def send_cancel_buy_order():
     data = request.get_json()
-    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+    print(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'])
 
-    cancel_buy_order = kiwoom_trade.cancel_buy_order(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'], data['original_order_num'])
+    cancel_buy_order = kiwoom_trade.cancel_buy_order(data['account'], data['item_code'], data['quantity'],
+                                                     data['price'], data['trading_type'], data['original_order_num'])
 
     return jsonify(cancel_buy_order)
+
 
 # 매도주문 취소
 @app.route("/order/cancel/sell", methods=['POST'])
 def send_cancel_sell_order():
     data = request.get_json()
-    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+    print(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'])
 
-    cancel_sell_order = kiwoom_trade.cancel_sell_order(data['account'], data['item_code'], data['quantity'], data['price'], data['trading_type'], data['original_order_num'])
+    cancel_sell_order = kiwoom_trade.cancel_sell_order(data['account'], data['item_code'], data['quantity'],
+                                                       data['price'], data['trading_type'], data['original_order_num'])
 
     return jsonify(cancel_sell_order)
 
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@app.route("/market/item_code", methods=['POST'])
+def send_item_list():
+    data = request.get_json()
+
+    item_name = data['item_name']
+
+    # 모든 시장 코드 가져오기
+    item_code_list = kiwoom_price.get_total_market_code()
+
+    # 이름 입력 -> 코드 리턴
+    result_name = kiwoom_price.find_item_name(item_code_list,item_name)
+
+    if result_name == 0:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result_name)
+
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # 백테스팅 코드
 @app.route("/backtest/minutes", methods=['GET'])
 def send_minute_backtest():
-
     data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
 
     result = kiwoom_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, data, 1.02, 0.982)
@@ -217,29 +242,31 @@ def send_minute_backtest():
         return jsonify(result)
 
 
-
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # 실시간 매매
 
 @app.route("/real_trading_start/", methods=['GET'])
 def start_real_trading():
-
     kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")  # Set up real-time data subscription
 
     return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
+
 @app.route("/real_trading_stop/", methods=['GET'])
 def stop_real_trading():
-
     kiwoom_real_trading.stop_real_trading()  # Set up real-time data subscription
 
     return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
 # Flask 서버 실행
 def run_flask_app():
     # socketio.init_app(app)
-    app.run(host='0.0.0.0', port=5000,debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
     # socketio.run(app, debug=True)
+
 
 # Kiwoom 서버 실행
 def run_kiwoom_app():
@@ -261,12 +288,8 @@ def run_kiwoom_app():
 
 
 if __name__ == "__main__":
-
     t = Thread(target=run_kiwoom_app)
     t.daemon = True  # 백그라운드 스레드로 실행
     t.start()
 
     run_flask_app()
-
-
-
