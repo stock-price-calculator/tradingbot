@@ -63,8 +63,9 @@ class Kiwoom_Send_Account:
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호", "0000")
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호입력매체구분", "00")
         Kiwoom.set_input_value(self.Kiwoom, "조회구분", "2")
-        Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌평가잔고내역요청", "opw00018", 0, "2000")
+        Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌평가잔고내역요청", "opw00018", "0", "2000")
 
+        print("정보를 보냄")
         self.wait_continuous_result()
         self.Kiwoom.continuous_data_success = False
 

@@ -28,22 +28,58 @@ class Kiwoom_Receive_Account:
     def receive_detail_account_mystock(self, sTrCode, sRQName):
         self.Kiwoom.return_list.clear()  # 결과리스트 초기화
 
-        total_buy_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총매입금액").strip()
-        total_evaluation_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총평가금액").strip()
-        total_profit_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총평가손익금액").strip()
-        total_profit_loss_rate = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)").strip()
+        repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
+
+        total_buy_money = (self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총매입금액").strip())
+        total_evaluation_money = (self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총평가금액").strip())
+        total_profit_money = (self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총평가손익금액").strip())
+        total_profit_loss_rate = (self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)").strip())
+
 
         self.Kiwoom.return_list.append({
-            "총매입금액": int(total_buy_money),
-            "총수익률(%)": int(total_profit_loss_rate),
-            "총평가금액" : int(total_evaluation_money),
-            "총평가손익금액" :int(total_profit_money),
+            "총매입금액": (total_buy_money),
+            "총수익률(%)": (total_profit_loss_rate),
+            "총평가금액" : (total_evaluation_money),
+            "총평가손익금액" :(total_profit_money),
         })
 
-        view.계좌평가잔고내역요청출력(total_buy_money,total_profit_loss_rate)
-        print(total_evaluation_money,total_profit_money)
-        self.Kiwoom.data_success = True
+        # view.계좌평가잔고내역요청출력(total_buy_money,total_profit_loss_rate)
+        # print(total_evaluation_money,total_profit_money)
 
+
+        for i in range(repeat):
+            item_code = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "종목코드").strip()
+            item_name = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "종목명").strip()
+            evaluation_profit_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "평가손익").strip()
+            profit_ratio = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "수익률").strip()
+            buy_price = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "매입가").strip()
+            buy_count = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "보유수량").strip()
+            current_price = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "현재가").strip()
+            buy_total_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "매입금액").strip()
+            total_tax = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "수수료합").strip()
+            tax = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "세금").strip()
+            buy_evaluation_total_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "평가금액").strip()
+            my_total_percentage = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "보유비중(%)").strip()
+
+            list = []
+
+            list.append({
+                "종목코드": item_code,
+                "종목명": item_name,
+                "평가손익": evaluation_profit_money,
+                "수익률": profit_ratio,
+                "매입가": buy_price,
+                "보유수량": buy_count,
+                "현재가": current_price,
+                "매입금액": buy_total_money,
+                "수수료합": total_tax,
+                "세금": tax,
+                "평가금액": buy_evaluation_total_money,
+                "보유비중(%)": my_total_percentage,
+            })
+
+            self.Kiwoom.return_list.append(list)
+        self.Kiwoom.data_success = True
 
 
     # 계좌별주문체결내역상세요청 값 받기
