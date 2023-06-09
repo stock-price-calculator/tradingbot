@@ -75,10 +75,7 @@ class Kiwoom_Receive_Account:
     def receive_price_earning_ratio(self, sTrCode, sRQName, sRecordName):
         self.Kiwoom.return_list.clear()  # 결과리스트 초기화
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
-        print("요청이 왔다.")
-        print(repeat)
-        print(self.Kiwoom.continuous_data_success)
-        print(self.Kiwoom.data_success)
+
         for i in range(repeat):
             trade_time = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "일자").strip()
             item_code = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "종목코드").strip()
@@ -99,9 +96,7 @@ class Kiwoom_Receive_Account:
                 "매입금액": trade_total_price,
                 "보유수량": item_buy_count
             })
-        print("요청을 다 받았다.")
-        print(self.Kiwoom.continuous_data_success)
-        print(self.Kiwoom.data_success)
+
         self.Kiwoom.data_success = True
 
     # opt10076 체결요청
@@ -137,11 +132,6 @@ class Kiwoom_Receive_Account:
         trade_charge = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "매매수수료").strip()
         trade_tax = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "매매세금").strip()
 
-        print("총매수금액 : " + total_buy_money)
-        print("총매도금액 : " + total_sell_money)
-        print("실현손익 : " + profit_money)
-        print("매매수수료 : " + trade_charge)
-        print("매매세금 : " + trade_tax)
 
         self.Kiwoom.return_list.append({
             "총매수금액": total_buy_money,

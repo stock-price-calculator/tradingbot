@@ -104,11 +104,7 @@ class Kiwoom_Send_Account:
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌수익률요청", "opt10085", 0, "2000")
 
-
         self.wait_continuous_result()
-        print("탈출함")
-        print(self.Kiwoom.continuous_data_success)
-        print(self.Kiwoom.data_success)
 
         self.Kiwoom.continuous_data_success = False
 

@@ -101,7 +101,7 @@ def get_user_order_history():
         return jsonify(result)
 
 # 계좌수익률요청 - 보유 주식량 확인
-@app.route("/user/account/pofit11", methods=['GET'])
+@app.route("/user/account/profit", methods=['GET'])
 def get_user_profit():
     result = kiwoom_account.send_price_earning_ratio(constants.ACCOUNT)
 
@@ -138,18 +138,18 @@ def get_user_day_profit():
 # 매수주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/buy", methods=['POST'])
 def send_buy_order():
-    data = request.get_json()
-    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+    # data = request.get_json()
+    # print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
-    buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.LG_CODE, 1, 0, "시장가")
+    buy_order = kiwoom_trade.send_buy_order(constants.ACCOUNT, constants.SAMSUNG_CODE, 1, 0, "시장가")
 
     return jsonify(buy_order)
 
 # 매도주문 계좌번호/종목코드/수량/가격/구매타입
 @app.route("/order/sell", methods=['POST'])
 def send_sell_order():
-    data = request.get_json()
-    print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
+    # data = request.get_json()
+    # print(data['account'], data['item_code'], data['quantity'],data['price'], data['trading_type'])
 
     sell_order =kiwoom_trade.send_sell_order(constants.ACCOUNT, constants.LG_CODE, 1, 0, "시장가")
 
@@ -210,7 +210,7 @@ def stop_real_trading():
 # Flask 서버 실행
 def run_flask_app():
     # socketio.init_app(app)
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000,debug=True)
     # socketio.run(app, debug=True)
 
 # Kiwoom 서버 실행
@@ -233,13 +233,6 @@ def run_kiwoom_app():
 
 
 if __name__ == "__main__":
-
-    # app1 = QApplication(sys.argv)  # QApplication 인스턴스 생성
-    # t = Thread(target=run_flask_app)
-    # t.daemon = True  # 백그라운드 스레드로 실행
-    # t.start()
-    # kiwoom = Kiwoom()
-    # app1.exec_()
 
     t = Thread(target=run_kiwoom_app)
     t.daemon = True  # 백그라운드 스레드로 실행
