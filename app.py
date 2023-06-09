@@ -211,6 +211,7 @@ def send_cancel_sell_order():
     return jsonify(cancel_sell_order)
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# 종목명 -> 종목코드로 변환
 @app.route("/market/item_code", methods=['POST'])
 def send_item_list():
     data = request.get_json()
@@ -227,6 +228,20 @@ def send_item_list():
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result_name)
+
+@app.route("/market/information", methods=['POST'])
+def send_item_information():
+    data = request.get_json()
+
+    item_code = data['item_code']
+
+    item_information = kiwoom_price.send_market_information(item_code)
+
+
+    if not item_information:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(item_information)
 
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

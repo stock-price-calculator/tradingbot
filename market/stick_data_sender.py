@@ -57,11 +57,21 @@ class Kiwoom_Price:
         Kiwoom.set_input_value(self.Kiwoom, "끝일자", last_date)
         Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "주식주봉차트조회요청", "opt10082", 0, "2000")
+    # 주식기본정보요청
+    def send_market_information(self, item_code):
+        self.Kiwoom.return_list.clear()
+        Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
+        Kiwoom.send_comm_rq_data(self.Kiwoom, "주식기본정보요청", "opt10001", 0, "2000")
+
+        self.wait_result()
+
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
 
     # 마켓 종목코드 전부 가져오기
     def get_total_market_code(self):
         result = self.Kiwoom.GetCodeListByMarket('0').split(';')
-        print(result)
+
         return result
 
     # 종목 코드 받아서 이름 리턴
@@ -81,3 +91,6 @@ class Kiwoom_Price:
             print("종목명",code_name,"종목코드",code)
 
         return 0
+
+
+

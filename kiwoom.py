@@ -143,6 +143,8 @@ class Kiwoom:
             self.continuous_data_success = True
         elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
             print("주문 완료")
+        elif sRQName == "주식기본정보요청":
+            self.receive_market_price.receive_market_information(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
             data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
             self.return_list += data_list
@@ -217,20 +219,11 @@ class Kiwoom:
 
         return item_code_list
 
+    # 종목코드 -> 종목이름
     def GetMarsterCodeName(self, item_code):
         item_name = self.ocx.dynamicCall("GetMasterCodeName(QString)", item_code)
 
         return item_name
-
-    # def get_item_code(self, item_name):
-    #     code_list = self.ocx.dynamicCall("GetCodeListByMarket("0"))  # "0" for KOSPI market, "10" for KOSDAQ market
-    #     print(code_list)
-    #     for code in code_list:
-    #         name = self.GetMasterCodeName(code)
-    #         if name == item_name:
-    #             return code
-    #
-    #     return None  # Return None if the item name is not found
 
     def get_comm_data(self, trcode, record_name, next, rqname):
         comm_data = self.ocx.dynamicCall("GetCommData(String, String, int, String)", trcode, record_name, next, rqname)
