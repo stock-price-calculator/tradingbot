@@ -29,13 +29,19 @@ class Kiwoom_Receive_Account:
         self.Kiwoom.return_list.clear()  # 결과리스트 초기화
 
         total_buy_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총매입금액").strip()
+        total_evaluation_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총평가금액").strip()
+        total_profit_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총평가손익금액").strip()
         total_profit_loss_rate = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)").strip()
-        a = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "종목번호").strip()
+
         self.Kiwoom.return_list.append({
-            "총매입금액": total_buy_money,
-            "총수익률(%)": total_profit_loss_rate,
+            "총매입금액": int(total_buy_money),
+            "총수익률(%)": int(total_profit_loss_rate),
+            "총평가금액" : int(total_evaluation_money),
+            "총평가손익금액" :int(total_profit_money),
         })
-        view.계좌평가잔고내역요청출력(total_buy_money, total_profit_loss_rate)
+
+        view.계좌평가잔고내역요청출력(total_buy_money,total_profit_loss_rate)
+        print(total_evaluation_money,total_profit_money)
         self.Kiwoom.data_success = True
 
 
