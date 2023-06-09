@@ -1,12 +1,10 @@
 import view.account_view as view
 import json
 
-
 class Kiwoom_Receive_Account:
 
     def __init__(self, main_kiwoom):
         self.Kiwoom = main_kiwoom
-
 
     # 예수금상세현황요청 값 받기
     def receive_detail_account_info(self, sTrCode, sRQName):
@@ -32,7 +30,7 @@ class Kiwoom_Receive_Account:
 
         total_buy_money = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총매입금액").strip()
         total_profit_loss_rate = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)").strip()
-
+        a = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "종목번호").strip()
         self.Kiwoom.return_list.append({
             "총매입금액": total_buy_money,
             "총수익률(%)": total_profit_loss_rate,
@@ -132,7 +130,6 @@ class Kiwoom_Receive_Account:
         trade_charge = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "매매수수료").strip()
         trade_tax = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "매매세금").strip()
 
-
         self.Kiwoom.return_list.append({
             "총매수금액": total_buy_money,
             "총매도금액": total_sell_money,
@@ -149,16 +146,9 @@ class Kiwoom_Receive_Account:
             day_trade_charge = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "당일매매수수료").strip()
             day_trade_tax = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "당일매매세금").strip()
 
-            print("-------------------------------------")
-            print("일자 : " + date)
-            print("매수금액 : " + buy_total_price)
-            print("매도금액 : " + sell_total_price)
-            print("당일매도손익 : " + day_profit_money)
-            print("당일매매수수료 : " + day_trade_charge)
-            print("당일매매세금 : " + day_trade_tax)
-            print("-------------------------------------")
+            list =[]
 
-            self.Kiwoom.return_list.append({
+            list.append({
                 "일자": date,
                 "매수금액": buy_total_price,
                 "매도금액": sell_total_price,
@@ -166,4 +156,6 @@ class Kiwoom_Receive_Account:
                 "당일매매수수료": day_trade_charge,
                 "당일매매세금": day_trade_tax,
             })
+
+            self.Kiwoom.return_list.append(list)
         self.Kiwoom.data_success = True

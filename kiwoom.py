@@ -132,6 +132,7 @@ class Kiwoom:
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
             self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
+            self.continuous_data_success = True
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
             self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)

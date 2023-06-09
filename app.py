@@ -122,7 +122,7 @@ def get_user_conclusion():
 # 일자별실현손익요청
 @app.route("/user/account/day-profit", methods=['GET'])
 def get_user_day_profit():
-    result = kiwoom_account.send_day_earn_data(constants.ACCOUNT, "20230101", "20230531")
+    result = kiwoom_account.send_day_earn_data(constants.ACCOUNT, "20230606", "20230609")
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
