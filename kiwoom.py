@@ -163,8 +163,14 @@ class Kiwoom:
                 time.sleep(0.5)
                 self.continuous_data_success = True
 
-        # elif sRQName == "주식주봉차트조회요청":
-        #     self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
+        elif sRQName == "주식주봉차트조회요청":
+            data_list = self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
+
+            self.return_list += data_list
+
+            if not self.remained_data:
+                time.sleep(0.5)
+                self.continuous_data_success = True
 
         self.tr_event_loop.exit()
 

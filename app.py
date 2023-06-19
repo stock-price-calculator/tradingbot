@@ -280,14 +280,15 @@ def send_day_backtest():
 
     item_code = data['item_code']
     start_date = data['start_date']
+    time_type = data['time_type']
     profit_ratio = data['profit_ratio']
     loss_ratio = data['loss_ratio']
-    day_type = data['day_type']
+
 
     # start_date = 20230505 라면 20200101 ~ 2023.05.05 까지의 데이터를 가져옴
     data = kiwoom_price.send_day_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, day_type, data, profit_ratio, loss_ratio)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -299,16 +300,15 @@ def send_week_backtest():
     data = request.get_json()
 
     item_code = data['item_code']
-    minute_type = data['minute_type']
+    start_date = data['start_date']
+    time_type = data['time_type']
     profit_ratio = data['profit_ratio']
     loss_ratio = data['loss_ratio']
 
-    # result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, 1.02, 0.982)
-    # data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
 
-    data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
+    data = kiwoom_price.send_week_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, profit_ratio, loss_ratio)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:

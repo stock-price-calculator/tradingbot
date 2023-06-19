@@ -67,12 +67,31 @@ class Kiwoom_Price:
             return self.Kiwoom.return_list
 
     # 주봉차트 조회
-    def send_week_chart_data(self, item_code, start_date, last_date):
+    def send_week_chart_data(self, item_code, start_date):
+        self.Kiwoom.return_list.clear()
+
         Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
         Kiwoom.set_input_value(self.Kiwoom, "기준일자", start_date)
-        Kiwoom.set_input_value(self.Kiwoom, "끝일자", last_date)
+        Kiwoom.set_input_value(self.Kiwoom, "끝일자", "")
         Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "주식주봉차트조회요청", "opt10082", 0, "2000")
+
+        while self.Kiwoom.remained_data:
+            time.sleep(0.2)
+
+            Kiwoom.set_input_value(self.Kiwoom, "종목코드", item_code)
+            Kiwoom.set_input_value(self.Kiwoom, "기준일자", start_date)
+            Kiwoom.set_input_value(self.Kiwoom, "끝일자", "")
+            Kiwoom.set_input_value(self.Kiwoom, "수정주가구분", "0")
+            Kiwoom.send_comm_rq_data(self.Kiwoom, "주식주봉차트조회요청", "opt10082", "2", "2000")
+
+        self.wait_continuous_result()
+        self.Kiwoom.continuous_data_success = False
+
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
+
+
     # 주식기본정보요청
     def send_market_information(self, item_code):
         self.Kiwoom.return_list.clear()
