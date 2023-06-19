@@ -26,61 +26,20 @@ from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
 
 
-class Kiwoom:
-    def __init__(self):
-
-
-        self.login_event_loop = None # login요청값을 받을 때 exit
-        self.tr_event_loop = None # tr요청값을 받을 때 exit
-        self.ocx = None
-        self.create_loop_event()
-        self.create_kiwoom_instance()
+class Kiwoom_Real_trade:
+    def __init__(self, main_kiwoom):
+        self.kiwoom = main_kiwoom
         self.connect_event()
-        self.connect_login() # 로그인 요청
-        # self.SetRealReg("0111", "005930", "10", "0")
-
-        n = int(input("메뉴번호를 선택하세요 : "))
-
-        if n == 1:
-            self.DisConnectRealData("0111")
-        elif n == 2:
-            self.SetRealRemove("ALL", "ALL")
-        elif n == 3:
-            self.SetRealReg("0111", "005930", "10", "0")
-
-
-
-
-
-        # self.SetRealReg("0101", "8043137211", "9201", "0")
-    # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
-    def create_kiwoom_instance(self):
-        self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
+        self.realtime_event_loop = QEventLoop()
 
     # 이벤트 요청 연결
     def connect_event(self):
-        self.ocx.OnEventConnect.connect(self.login_slot)
-        self.ocx.OnReceiveRealData.connect(self.receive_realdata)
+        self.kiwoom.ocx.OnReceiveRealData.connect(self.receive_realdata)
 
-    # 이벤트 루프 생성
-    def create_loop_event(self):
-        self.login_event_loop = QEventLoop()  # 로그인 담당 이벤트 루프
-
-    # 로그인 메서드 호출
-    def connect_login(self):
-        self.ocx.dynamicCall("CommConnect()")
-        self.login_event_loop.exec_()
-
-    # 로그인 성공 여부
-    def login_slot(self, err_code):
-        if err_code == 0:
-            print("로그인에 성공하였습니다.")
-        else:
-            print("로그인에 실패하였습니다.")
-            sys.exit(0)
-        self.login_event_loop.exit()
-
-
+    def stop_real_trading(self):
+        self.realtime_event_loop.exit()
+        self.SetRealRemove("ALL","ALL")
+        
     # 주식체결 받아오기
     def receive_realdata(self, sJongmokCode, sRealType, sRealData):
 
@@ -116,24 +75,20 @@ class Kiwoom:
         #     print("-----------------------------------------")
         #
 
-
+    # 실시간 등록
     def SetRealReg(self, screen_no, code_list, fid_list, real_type):
-        self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
+        self.kiwoom.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
                              screen_no, code_list, fid_list, real_type)
+        self.realtime_event_loop.exec_()
 
     def get_comm_real_data(self, item_code, fid):
-        return self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
+        return self.kiwoom.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
 
     def DisConnectRealData(self, screen_no):
-        self.ocx.dynamicCall("DisConnectRealData(QString)", screen_no)
+        self.kiwoom.ocx.dynamicCall("DisConnectRealData(QString)", screen_no)
 
     def SetRealRemove(self,strScrNo, strDelCode):
-        self.ocx.dynamicCall("SetRealRemove(QString, QString", strScrNo, strDelCode)
+        self.kiwoom.ocx.dynamicCall("SetRealRemove(QString, QString", strScrNo, strDelCode)
 
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = Kiwoom()
-    #window.show()
-    app.exec_()

@@ -6,17 +6,24 @@ import view
 import traceback
 from idlelib.iomenu import errors
 
-from PyQt5.QtCore import QEventLoop
+from PyQt5.QtCore import QEventLoop, QCoreApplication
 
 import constants
 from PyQt5.QAxContainer import *
 from account.account_receiver import Kiwoom_Receive_Account
 from market.stick_data_receiver import Kiwoom_Receive_Market_price
-from backtesting.backtest import *
+from backtesting.backtest import Kiwoom_BackTesting
 
 
 
 class Kiwoom:
+    _instance = None
+    def __new__(cls, *args, **kwargs):
+        # 인스턴스가 없는 경우에만 인스턴스를 생성
+        if not cls._instance:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self):
 
         self.remained_data = False  #차트데이터 요청할때 sPrevNext가 2이면 계속
@@ -26,10 +33,16 @@ class Kiwoom:
         self.create_loop_event()
         self.create_kiwoom_instance()
         self.connect_event()
-        self.connect_login() # 로그인 요청
+
+        self.login_success = False  # loop못사용해서 변수 설정
+        self.data_success = False # loop못사용해서 변수 설정
+        self.continuous_data_success = False
         self.receive_account = Kiwoom_Receive_Account(self)
         self.receive_market_price = Kiwoom_Receive_Market_price(self)
+        self.receive_backtest = Kiwoom_BackTesting(self)
         self.result_list = []
+
+        self.return_list = []  #결과값 리턴할 리스트
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
@@ -39,6 +52,7 @@ class Kiwoom:
     def connect_event(self):
         self.ocx.OnEventConnect.connect(self.login_slot)
         self.ocx.OnReceiveTrData.connect(self.receive_trdata)
+        # self.ocx.OnReceiveRealData.connect(self.receive_realdata)
 
     # 이벤트 루프 생성
     def create_loop_event(self):
@@ -47,16 +61,23 @@ class Kiwoom:
     # 로그인 메서드 호출
     def connect_login(self):
         self.ocx.dynamicCall("CommConnect()")
-        self.login_event_loop.exec_()
+
+        while not self.login_success:
+            QCoreApplication.processEvents()
+            time.sleep(0.2)
+
+        if self.login_success:
+            return 0
 
     # 로그인 성공 여부
     def login_slot(self, err_code):
         if err_code == 0:
             print("로그인에 성공하였습니다.")
+            self.login_success = True
+            self.login_event_loop.exit(1)
         else:
             print("로그인에 실패하였습니다.")
-            sys.exit(0)
-        self.login_event_loop.exit()
+            self.login_event_loop.exit(0)
 
     # 종목코드의 종목명을 반환
     def get_master_code_name(self, code):
@@ -74,14 +95,10 @@ class Kiwoom:
     # USER_NAME - 사용자명을 반환한다
     # KEY_BSECGB - 키보드보안 해지여부 0:정상 1:해지
     # FIREW_SECGB - 방화벽 설정 여부 0:미설정 1:설정 2:해지
+
     # 사용자 정보 및 계좌 정보
     def get_login_info(self, tag):
         result = self.ocx.dynamicCall("GetLoginInfo(QString)", tag)
-        return result
-
-    # 전일가
-    def get_master_last_price(self, code):
-        result = self.ocx.dynamicCall("GetMasterLastPrice(QString)", code)
         return result
 
     # 요청한 tr값 수신
@@ -98,7 +115,7 @@ class Kiwoom:
         '''
 
         # view.print_receive_trdata_element( sScrNo, sRQName, sTrCode, sRecordName, sPrevNext)
-
+        #
         if sPrevNext == "2":
             self.remained_data = True
         else:
@@ -110,35 +127,70 @@ class Kiwoom:
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
             self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
+            self.continuous_data_success = True
         # 체결내역
         elif sRQName == "계좌별주문체결내역상세요청":
             self.receive_account.receive_trading_record(sTrCode, sRQName, sRecordName)
-        elif sRQName == "주식분봉차트조회요청":
-            data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
-            self.result_list += data_list
-
-            if not self.remained_data:
-                # plot_bollinger_bands(self.result_list)
-                bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
-                self.result_list.clear()
-
-        elif sRQName == "주식일봉차트조회요청":
-            self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
-        elif sRQName == "주식주봉차트조회요청":
-            self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
+            self.continuous_data_success = True
         elif sRQName == "계좌수익률요청":
             self.receive_account.receive_price_earning_ratio(sTrCode,sRQName, sRecordName)
-
-        elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
-            print("주문 완료")
-
+            self.continuous_data_success = True
         elif sRQName == "체결요청":
             self.receive_account.receive_conclude_data(sTrCode,sRQName,sRecordName)
-
+            self.continuous_data_success = True
         elif sRQName == "일자별실현손익요청":
             self.receive_account.receive_day_earn_data(sTrCode,sRQName,sRecordName)
+            self.continuous_data_success = True
+        elif sRQName == "신규매수주문" or sRQName == "신규매도주문":
+            print("주문 완료")
+        elif sRQName == "주식기본정보요청":
+            self.receive_market_price.receive_market_information(sTrCode, sRQName, sRecordName)
+        elif sRQName == "주식분봉차트조회요청":
+            data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+            self.return_list += data_list
+
+            if not self.remained_data:
+                time.sleep(0.5)
+                self.continuous_data_success = True
+                # self.receive_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
+                # self.result_list.clear()
+
+        elif sRQName == "주식일봉차트조회요청":
+            data_list = self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
+            self.return_list += data_list
+
+            if not self.remained_data:
+                time.sleep(0.5)
+                self.continuous_data_success = True
+
+        elif sRQName == "주식주봉차트조회요청":
+            data_list = self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
+
+            self.return_list += data_list
+
+            if not self.remained_data:
+                time.sleep(0.5)
+                self.continuous_data_success = True
+
         self.tr_event_loop.exit()
 
+    # 실시간 데이터 받아오기
+    def receive_realdata(self, sJongmokCode, sRealType, sRealData):
+
+        if sRealType == "주식체결":
+            print("-----------------------------------------")
+            print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
+            print("전일대비 : " + self.get_comm_real_data(sJongmokCode, 11))
+            print("등락율 : " + self.get_comm_real_data(sJongmokCode, 12))
+            print("매도호가 : " + self.get_comm_real_data(sJongmokCode, 27))
+            print("매수호가 : " + self.get_comm_real_data(sJongmokCode, 28))
+            print("누적거래량 : " + self.get_comm_real_data(sJongmokCode, 13))
+            print("시가 : " + self.get_comm_real_data(sJongmokCode, 16))
+            print("고가 : " + self.get_comm_real_data(sJongmokCode, 17))
+            print("저가 : " + self.get_comm_real_data(sJongmokCode, 18))
+            print("전일거래량대비 : " + self.get_comm_real_data(sJongmokCode, 26))
+            print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
+            print("-----------------------------------------")
 
     # tr요청 기본 함수
     # tr 데이터 정보 입력
@@ -150,6 +202,9 @@ class Kiwoom:
         self.ocx.dynamicCall("CommRqData(String,String,int,String)", rqname, trcode, next, screen_number)
         self.tr_event_loop = QEventLoop()
         self.tr_event_loop.exec_()
+        self.data_success = False
+        # self.continuous_data_success = False
+
 
     # tr 반복수 받음
     def get_repeat_cnt(self, trcode, rqname):
@@ -167,6 +222,27 @@ class Kiwoom:
         self.tr_event_loop.exec_()
         return trade_data
 
+    # 시장종목 리스트를 가져오기 (종목코드 가져오기)
+    def GetCodeListByMarket(self,market):
+        item_code_list = self.ocx.dynamicCall("GetCodeListByMarket(QString)",market)
+
+        return item_code_list
+
+    # 종목코드 -> 종목이름
+    def GetMarsterCodeName(self, item_code):
+        item_name = self.ocx.dynamicCall("GetMasterCodeName(QString)", item_code)
+
+        return item_name
+
     def get_comm_data(self, trcode, record_name, next, rqname):
         comm_data = self.ocx.dynamicCall("GetCommData(String, String, int, String)", trcode, record_name, next, rqname)
         return comm_data
+
+    # 실시간
+    def get_comm_real_data(self, item_code, fid):
+        return self.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
+
+    # 실시간 요청 등록
+    def SetRealReg(self, screen_no, code_list, fid_list, real_type):
+        self.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
+                             screen_no, code_list, fid_list, real_type)
