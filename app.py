@@ -5,15 +5,14 @@ from flask import Flask, jsonify, request, render_template
 import constants
 from kiwoom import Kiwoom
 from threading import Thread, Event
-from router.user import user_bp
 from account.account_sender import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
 from backtesting.backtest import Kiwoom_BackTesting
 from realtime.trading import Kiwoom_Real_trade
 from flask_restx import Api, Resource, reqparse
-from flask_socketio import SocketIO, emit
 from flask_cors import CORS
+
 
 app = Flask(__name__)
 
@@ -21,7 +20,9 @@ CORS(app,  resources={r"/*": {"origins": "*"}})
 
 # api swagger
 api = Api(app, version='1.0', title='API 문서', description='Swagger 문서', doc="/api-docs")
+
 test_api = api.namespace('test', description='조회 API')
+
 
 kiwoom = None
 kiwoom_account = None
@@ -250,27 +251,86 @@ def send_item_information():
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # 백테스팅 코드
-@app.route("/backtest/minutes", methods=['GET'])
-def send_minute_backtest():
-    data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
 
-    result = kiwoom_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, data, 1.02, 0.982)
+# 분봉 백테스팅
+@app.route("/backtest/minutes", methods=['POST'])
+def send_minute_backtest():
+    data = request.get_json()
+
+    item_code = data['item_code']
+    minute_type = data['minute_type']
+    profit_ratio = data['profit_ratio']
+    loss_ratio = data['loss_ratio']
+
+    # result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, 1.02, 0.982)
+    # data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
+
+    data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
+
+    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, profit_ratio, loss_ratio)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result)
 
+# 일봉 백테스팅
+@app.route("/backtest/day", methods=['POST'])
+def send_day_backtest():
+    data = request.get_json()
 
+    item_code = data['item_code']
+    start_date = data['start_date']
+    profit_ratio = data['profit_ratio']
+    loss_ratio = data['loss_ratio']
+    day_type = data['day_type']
+
+    # start_date = 20230505 라면 20200101 ~ 2023.05.05 까지의 데이터를 가져옴
+    data = kiwoom_price.send_day_chart_data(item_code, start_date)
+
+    result = kiwoom_backtest.bollinger_backtesting(item_code, day_type, data, profit_ratio, loss_ratio)
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result)
+
+# 주봉 백테스팅
+@app.route("/backtest/week", methods=['POST'])
+def send_week_backtest():
+    data = request.get_json()
+
+    item_code = data['item_code']
+    minute_type = data['minute_type']
+    profit_ratio = data['profit_ratio']
+    loss_ratio = data['loss_ratio']
+
+    # result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, 1.02, 0.982)
+    # data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
+
+    data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
+
+    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, profit_ratio, loss_ratio)
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify(result)
+
+#
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # 실시간 매매
 
-@app.route("/real_trading_start", methods=['GET'])
+@app.route("/real_trading_start", methods=['POST'])
 def start_real_trading():
+
+    data = request.get_json()
+
+    # 종목코드, 볼린저밴드 값, 익절, 손절,
+
     kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")  # Set up real-time data subscription
 
     return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
 
+# 실시간 매매 종료
 @app.route("/real_trading_stop", methods=['GET'])
 def stop_real_trading():
     kiwoom_real_trading.stop_real_trading()  # Set up real-time data subscription

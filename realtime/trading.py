@@ -75,7 +75,7 @@ class Kiwoom_Real_trade:
         #     print("-----------------------------------------")
         #
 
-
+    # 실시간 등록
     def SetRealReg(self, screen_no, code_list, fid_list, real_type):
         self.kiwoom.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
                              screen_no, code_list, fid_list, real_type)

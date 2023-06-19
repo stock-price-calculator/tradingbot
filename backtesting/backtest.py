@@ -46,50 +46,57 @@ class Kiwoom_BackTesting:
         buy_price = 0.0
         myasset = 10000
         buy = False
+        size = 1000
 
         # 총 손익
-        asset = []
+        # asset = []
 
         per = 1
         count = 0  # 거래횟수
         win_count = 0  # 이득인 거래수
 
-        target_per = 1.02
-        target_sell_per = 0.982
+        # target_per = 1.02
+        # target_sell_per = 0.982
 
         for i, row in df.iterrows():
-            if count == 20:
-                break;
             # 매수 조건 - 볼린저밴드 하단에 닿을 때
+
+            if count == 20:
+                break
             if row['low'] <= row['lower'] and buy == False:
                 buy = True
                 count += 1
-                buy_price = (int)(row['lower'] * 10) / 10.0
-                myasset = (1 - constants.TRADE_CHARGE) * myasset  # 수수료
+                buy_price = (int(row['lower'] / size)) * size
+                # myasset = (1 - constants.TRADE_CHARGE) * myasset  # 수수료
             elif buy == True and (row['high'] >= buy_price * target_per or
                                                          row['low'] <= buy_price * target_sell_per or
                                                          row['high'] >= row['upper']):
                 if row['low'] <= buy_price * target_sell_per:
-                    sell_price = buy_price * target_sell_per
+                    sell_price = (int(buy_price * target_sell_per / size))*size
 
                 elif row['high'] >= row['upper']:
-                    sell_price = (int)(row['upper'] * 10) / 10.0
+                    sell_price = (int(row['upper'] / size)) * size
 
                 else:
-                    sell_price = buy_price * target_per
+                    sell_price = (int(buy_price * target_per / size))*size
 
-                myasset = myasset * (1 + (sell_price - buy_price) / buy_price)
-                myasset -= myasset * constants.TRADE_CHARGE
-
-                asset.append(myasset)
 
                 buy = False
+
+                per = (sell_price - buy_price) / buy_price * 100 - constants.TRADE_CHARGE * 2
+
+                myasset = myasset + myasset * per /100
+
+                print("------------------------------")
+                print("구매금액 : ", buy_price)
+                print("판매금액 : ", sell_price)
                 print(per)
                 print(myasset)
-                per = per * (1 + (sell_price - buy_price) / buy_price - constants.TRADE_CHARGE * 2)
+                print("------------------------------")
+
                 if sell_price - buy_price > 0:
                     win_count += 1
-        view.bollinger_backtesting_result(item_code, time_type, per, myasset, count, win_count)
+        # view.bollinger_backtesting_result(item_code, time_type, per, myasset, count, win_count)
 
         return {
             "종목코드": item_code,

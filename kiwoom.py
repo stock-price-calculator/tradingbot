@@ -148,18 +148,21 @@ class Kiwoom:
         elif sRQName == "주식분봉차트조회요청":
             data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
             self.return_list += data_list
-            print(len(self.return_list))
 
             if not self.remained_data:
-                print(self.return_list)
-                print("남은 데이터가 없어졌당")
                 time.sleep(0.5)
                 self.continuous_data_success = True
                 # self.receive_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
                 # self.result_list.clear()
 
-        # elif sRQName == "주식일봉차트조회요청":
-        #     self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
+        elif sRQName == "주식일봉차트조회요청":
+            data_list = self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
+            self.return_list += data_list
+
+            if not self.remained_data:
+                time.sleep(0.5)
+                self.continuous_data_success = True
+
         # elif sRQName == "주식주봉차트조회요청":
         #     self.receive_market_price.receive_week_chart_data(sTrCode, sRQName, sRecordName)
 
