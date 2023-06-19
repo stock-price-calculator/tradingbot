@@ -28,9 +28,9 @@ _constant.CANCEL_SELL = 4
 _constant.CHANGE_BUY = 5
 _constant.CHANGE_SELL = 6
 
-# main.py
+# app.py
 
-_constant.ACCOUNT = "8043137211"
+_constant.ACCOUNT = "8051014511"
 _constant.SAMSUNG_CODE = "005930"
 _constant.LG_CODE ="066570"
 
