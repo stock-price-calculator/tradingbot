@@ -9,6 +9,8 @@ from account.account_sender import Kiwoom_Send_Account
 from order.trade import Kiwoom_Trade
 from market.stick_data_sender import Kiwoom_Price
 from backtesting.backtest import Kiwoom_BackTesting
+from price.calculator import calculateEPS
+from price.dto.eps import EPS
 from realtime.trading import Kiwoom_Real_trade
 from flask_restx import Api, Resource, reqparse
 from flask_cors import CORS
@@ -338,6 +340,14 @@ def stop_real_trading():
     return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+@app.route("/price", methods = ["GET"])
+def get_price():
+    code: str = request.args.get("code")
+    result: [EPS] = calculateEPS(code)
+    price = result[len(result) - 1].sp_eps * 10
+    return result[len(result) - 1].sp_eps * 10
 
 
 # Flask 서버 실행

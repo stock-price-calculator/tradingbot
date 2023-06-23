@@ -52,7 +52,7 @@ def calculateEPS(code: str, start_year: int = 2016, result: [EPS] = []):
         return False
 
 # PER = 시가 총액 / 당기순 이익
-def calculate_PER(code: str, start_year: int, result: [PER]) -> bool:
+def calculate_PER(code: str, start_year: int = 2016, result: [PER] = []):
     corp_code = get_corpcode_from_xml(code)
     total_price = []
     incomes: [NetIncome] = []
@@ -79,7 +79,7 @@ def calculate_PER(code: str, start_year: int, result: [PER]) -> bool:
         per = PER(bsns_year, sp_per, cs_per)
         result.append(per)
 
-    return True
+    return result
 
 # 단일회사 당기순이익 정보 가져오기
 def get_net_incomes_from_single_financial_statement(corp_code: str, bsns_year: str, results: [NetIncome]):  # 단일회사 재무정보
