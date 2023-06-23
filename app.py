@@ -261,6 +261,7 @@ def send_minute_backtest():
 
     total_data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
 
+    print(total_data)
     result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, total_data, profit_ratio, loss_ratio,20,2)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
@@ -318,6 +319,7 @@ def start_real_trading():
     # 화면번호, 종목코드, 등록할 FID, 종목코드, 시간타입, 익절, 손절, 볼린저n , k
     # kiwoom_real_trading.SetRealReg("0111", item_code, "10", "0", time_type, 2.03, 0.982, 20, 2)
 
+
     data = request.get_json()
     item_code = data['item_code']
     time_type = data['time_type'] # 분봉, 일봉, 주봉
@@ -327,16 +329,19 @@ def start_real_trading():
     bollinger_k = data['bollinger_k']
     get_parm = data['get_parm']  # 분봉일때는 분봉타입, 일봉, 주봉일 때는 start_date
 
+    # time_type마다 분리
     if time_type == "minute":
         total_data = kiwoom_price.send_minutes_chart_data(item_code, get_parm)
     elif time_type == "day":
         total_data = kiwoom_price.send_day_chart_data(item_code, get_parm)
     else:
         total_data = kiwoom_price.send_week_chart_data(item_code, get_parm)
-
+    print(total_data)
     print("값 받아오기 끝")
 
-    time.sleep(1)
+    result_list = kiwoom_backtest.plot_bollinger_bands(total_data,bollinger_n,bollinger_k)
+
+    kiwoom_backtest.set_graph(result_list,bollinger_n)
 
     kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n, bollinger_k,total_data)
 

@@ -160,9 +160,8 @@ class Kiwoom:
 
             if not self.remained_data:
                 time.sleep(0.5)
+                print("끝남")
                 self.continuous_data_success = True
-                # self.receive_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
-                # self.result_list.clear()
 
         elif sRQName == "주식일봉차트조회요청":
             data_list = self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)

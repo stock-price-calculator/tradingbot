@@ -42,8 +42,7 @@ class Kiwoom_Real_trade:
         
     # 주식체결 받아오기
     def receive_realdata(self, sJongmokCode, sRealType, sRealData):
-        print(sJongmokCode)
-        print(sRealType)
+
         if sRealType == "주식체결":
             currnet_price = self.get_comm_real_data(sJongmokCode, 10)
             print("----------------------------------------")
@@ -78,9 +77,9 @@ class Kiwoom_Real_trade:
     def SetRealReg(self, item_code):
         self.kiwoom.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
                              "0111", item_code, "10", "0")
+        print("등록완료")
 
-
-        # self.realtime_event_loop.exec_()
+        self.realtime_event_loop.exec_()
     def setPreTrading(self,  item_code,time_type, trade_parm, profit_ratio, loss_ratio, bollinger_n, bollinger_k,total_data):
         self.kiwoom.real_item_code = item_code  # 종목코드
         self.kiwoom.real_time_type = time_type  # 분봉, 일봉, 주봉
