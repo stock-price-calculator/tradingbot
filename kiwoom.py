@@ -44,6 +44,15 @@ class Kiwoom:
 
         self.return_list = []  #결과값 리턴할 리스트
 
+        self.real_item_code =None  # 종목코드
+        self.real_time_type = None  # 분봉, 일봉, 주봉
+        self.real_trade_parm = None  # 시작시간 or 분봉타입
+        self.real_profit_ratio = None  # 익절
+        self.real_loss_ratio = None  # 손절
+        self.real_bollinger_n = None
+        self.real_bollinger_k = None
+        self.real_total_data = None  # 이전 데이터
+
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
         self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")

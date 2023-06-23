@@ -1,4 +1,5 @@
 import sys
+import time
 
 from PyQt5.QtWidgets import *
 from flask import Flask, jsonify, request, render_template
@@ -258,9 +259,9 @@ def send_minute_backtest():
     # result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, 1.02, 0.982)
     # data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
 
-    data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
+    total_data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, profit_ratio, loss_ratio,20,2)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, total_data, profit_ratio, loss_ratio,20,2)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -279,9 +280,9 @@ def send_day_backtest():
 
 
     # start_date = 20230505 라면 20200101 ~ 2023.05.05 까지의 데이터를 가져옴
-    data = kiwoom_price.send_day_chart_data(item_code, start_date)
+    total_data = kiwoom_price.send_day_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio, 20, 2)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, 20, 2)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -299,9 +300,9 @@ def send_week_backtest():
     loss_ratio = data['loss_ratio']
 
 
-    data = kiwoom_price.send_week_chart_data(item_code, start_date)
+    total_data = kiwoom_price.send_week_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio, 20,2)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, 20,2)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -314,19 +315,35 @@ def send_week_backtest():
 @app.route("/real_trading_start", methods=['POST'])
 def start_real_trading():
 
-    # data = request.get_json()
+    # 화면번호, 종목코드, 등록할 FID, 종목코드, 시간타입, 익절, 손절, 볼린저n , k
+    # kiwoom_real_trading.SetRealReg("0111", item_code, "10", "0", time_type, 2.03, 0.982, 20, 2)
 
-    # 종목코드, 볼린저밴드 값, 익절, 손절,
+    data = request.get_json()
+    item_code = data['item_code']
+    time_type = data['time_type'] # 분봉, 일봉, 주봉
+    profit_ratio = data['profit_ratio']
+    loss_ratio = data['loss_ratio']
+    bollinger_n = data['bollinger_n']
+    bollinger_k = data['bollinger_k']
+    get_parm = data['get_parm']  # 분봉일때는 분봉타입, 일봉, 주봉일 때는 start_date
 
-    # 화면번호, 종목코드, 등록할 FID
-    # 실시간 데이터 받아오기
-    # target_per = 1.02
-    # target_sell_per = 0.982
+    if time_type == "minute":
+        total_data = kiwoom_price.send_minutes_chart_data(item_code, get_parm)
+    elif time_type == "day":
+        total_data = kiwoom_price.send_day_chart_data(item_code, get_parm)
+    else:
+        total_data = kiwoom_price.send_week_chart_data(item_code, get_parm)
 
-    kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0", "5", 2.03, 0.982, 20, 2)
+    print("값 받아오기 끝")
+
+    time.sleep(1)
+
+    kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n, bollinger_k,total_data)
+
+    # kiwoom_real_trading.SetRealReg(item_code)
     # kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")
 
-    return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    return jsonify({"result": "실시간매매 시작."})
 
 
 # 실시간 매매 종료
