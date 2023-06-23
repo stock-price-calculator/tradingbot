@@ -339,16 +339,18 @@ def stop_real_trading():
 
     return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-
-@app.route("/price", methods = ["GET"])
+@app.route("/price", methods=['GET'])
 def get_price():
-    code: str = request.args.get("code")
-    result: [EPS] = calculateEPS(code)
-    price = result[len(result) - 1].sp_eps * 10
-    return result[len(result) - 1].sp_eps * 10
+    code = request.args.get("code")
+    results: [EPS] = calculateEPS(code)
+    price = results[len(results) - 1].sp_eps * 10
+    return jsonify({
+        "result": price
+    })
 
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # Flask 서버 실행
 def run_flask_app():
