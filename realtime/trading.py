@@ -58,27 +58,24 @@ class Kiwoom_Real_trade:
             print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
             print("-----------------------------------------")
 
-        # if sRealType == "잔고":
-        #     print("-----------------------------------------")
-        #     print("계좌번호 : " + self.get_comm_real_data(sJongmokCode, 9201))
-        #     print("종목코드, 업종코드 : " + self.get_comm_real_data(sJongmokCode, 9001))
-        #     print("종목명 : " + self.get_comm_real_data(sJongmokCode, 302))
-        #     print("현재가 : " + self.get_comm_real_data(sJongmokCode, 10))
-        #     print("보유수량 : " + self.get_comm_real_data(sJongmokCode, 930))
-        #     print("매입단가 : " + self.get_comm_real_data(sJongmokCode, 931))
-        #     print("총매입가 : " + self.get_comm_real_data(sJongmokCode, 932))
-        #     print("주문가능수량 : " + self.get_comm_real_data(sJongmokCode, 933))
-        #     print("당일순매수량 : " + self.get_comm_real_data(sJongmokCode, 945))
-        #     print("매도/매수구분 : " + self.get_comm_real_data(sJongmokCode, 946))
-        #     print("손익율 : " + self.get_comm_real_data(sJongmokCode, 8019))
-        #     print("당일실현손익(유가) : " + self.get_comm_real_data(sJongmokCode, 990))
-        #     print("-----------------------------------------")
-        #
+
+    # 실시간 매매 시작
+    def real_trade_start(self, current_price):
+        # 몇 분봉,  익절,  손절,  볼린저밴드 값1, 볼린저밴드 값2, 종목코드
+
 
     # 실시간 등록
-    def SetRealReg(self, screen_no, code_list, fid_list, real_type):
+    def SetRealReg(self, screen_no, code_list, fid_list, real_type, time_type, profit_ratio, loss_ratio, bollinger_n, bollinger_k):
         self.kiwoom.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
                              screen_no, code_list, fid_list, real_type)
+
+        self.real_item_code = code_list # 종목코드
+        self.real_time_type = time_type # 몇 분봉
+        self.real_profit_ratio = profit_ratio # 익절
+        self.reale_loss_ratio = loss_ratio # 손절
+        self.real_bollinger_n = bollinger_n
+        self.real_bollinger_k = bollinger_k
+
         self.realtime_event_loop.exec_()
 
     def get_comm_real_data(self, item_code, fid):

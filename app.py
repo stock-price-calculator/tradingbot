@@ -60,17 +60,12 @@ def get_login():
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # 유저 이름, 계좌, id
-@app.route("/user/info", methods=['GET'])
+@app.route("/user/information", methods=['GET'])
 def get_user_data():
-    global kiwoom
 
-    if not kiwoom:
-        return jsonify(0)
     id = kiwoom.get_login_info("USER_ID")
     name = kiwoom.get_login_info("USER_NAME")
     account = kiwoom.get_login_info("ACCNO")
-
-    print(id, name, account)
 
     if not name and id and account:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
@@ -108,7 +103,6 @@ def get_user_order_history():
     data = request.get_json()
 
     term = data['term']
-    account = data['account']
     buy_or_sell = data['buy_or_sell']
     item_code = data['item_code']
 
@@ -242,7 +236,6 @@ def send_item_information():
 
     item_information = kiwoom_price.send_market_information(item_code)
 
-
     if not item_information:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -267,7 +260,7 @@ def send_minute_backtest():
 
     data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, profit_ratio, loss_ratio)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, profit_ratio, loss_ratio,20,2)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -288,7 +281,7 @@ def send_day_backtest():
     # start_date = 20230505 라면 20200101 ~ 2023.05.05 까지의 데이터를 가져옴
     data = kiwoom_price.send_day_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio, 20, 2)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -308,7 +301,7 @@ def send_week_backtest():
 
     data = kiwoom_price.send_week_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, data, profit_ratio, loss_ratio, 20,2)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -321,11 +314,17 @@ def send_week_backtest():
 @app.route("/real_trading_start", methods=['POST'])
 def start_real_trading():
 
-    data = request.get_json()
+    # data = request.get_json()
 
     # 종목코드, 볼린저밴드 값, 익절, 손절,
 
-    kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")  # Set up real-time data subscription
+    # 화면번호, 종목코드, 등록할 FID
+    # 실시간 데이터 받아오기
+    # target_per = 1.02
+    # target_sell_per = 0.982
+
+    kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0", "5", 2.03, 0.982, 20, 2)
+    # kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")
 
     return jsonify({"result": "정보를 불러오는데 실패했습니다."})
 
@@ -335,7 +334,7 @@ def start_real_trading():
 def stop_real_trading():
     kiwoom_real_trading.stop_real_trading()  # Set up real-time data subscription
 
-    return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    return jsonify({"result":"실시간 매매 종료"})
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 

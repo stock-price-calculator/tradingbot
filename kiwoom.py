@@ -192,6 +192,7 @@ class Kiwoom:
             print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
             print("-----------------------------------------")
 
+
     # tr요청 기본 함수
     # tr 데이터 정보 입력
     def set_input_value(self, id, value):

@@ -40,8 +40,8 @@ class Kiwoom_BackTesting:
 
 
     # 볼린저로만 테스트
-    def bollinger_backtesting(self,item_code, time_type, data_list, target_per, target_sell_per):
-        df = self.plot_bollinger_bands(data_list)
+    def bollinger_backtesting(self,item_code, time_type, data_list, target_per, target_sell_per, bollinger_n, bollinger_k):
+        df = self.plot_bollinger_bands(data_list, bollinger_n, bollinger_k)
 
         buy_price = 0.0
         myasset = 10000
