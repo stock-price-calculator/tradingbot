@@ -5,7 +5,7 @@ import constants
 import view.backtest_view as view
 
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  #main쓰레드 아니여도 사용가능 하도록
 import matplotlib.pyplot as plt
 
 class Kiwoom_BackTesting:

@@ -255,6 +255,8 @@ def send_minute_backtest():
     minute_type = data['minute_type']
     profit_ratio = data['profit_ratio']
     loss_ratio = data['loss_ratio']
+    bollinger_n = data['bollinger_n']
+    bollinger_k = data['bollinger_k']
 
     # result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, data, 1.02, 0.982)
     # data = kiwoom_price.send_minutes_chart_data(constants.SAMSUNG_CODE, "5")
@@ -262,7 +264,7 @@ def send_minute_backtest():
     total_data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
 
     print(total_data)
-    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, total_data, profit_ratio, loss_ratio,20,2)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, total_data, profit_ratio, loss_ratio,bollinger_n, bollinger_k)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -278,12 +280,13 @@ def send_day_backtest():
     time_type = data['time_type']
     profit_ratio = data['profit_ratio']
     loss_ratio = data['loss_ratio']
-
+    bollinger_n = data['bollinger_n']
+    bollinger_k = data['bollinger_k']
 
     # start_date = 20230505 라면 20200101 ~ 2023.05.05 까지의 데이터를 가져옴
     total_data = kiwoom_price.send_day_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, 20, 2)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, bollinger_n, bollinger_k)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
@@ -299,11 +302,12 @@ def send_week_backtest():
     time_type = data['time_type']
     profit_ratio = data['profit_ratio']
     loss_ratio = data['loss_ratio']
-
+    bollinger_n = data['bollinger_n']
+    bollinger_k = data['bollinger_k']
 
     total_data = kiwoom_price.send_week_chart_data(item_code, start_date)
 
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, 20,2)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, bollinger_n,bollinger_k)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
