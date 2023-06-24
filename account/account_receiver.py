@@ -37,7 +37,7 @@ class Kiwoom_Receive_Account:
 
         self.Kiwoom.return_list.append({
             "총매입금액": (total_buy_money),
-            "총수익률(%)": (total_profit_loss_rate),
+            "총수익률": (total_profit_loss_rate),
             "총평가금액" : (total_evaluation_money),
             "총평가손익금액" :(total_profit_money),
         })

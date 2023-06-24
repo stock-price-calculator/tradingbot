@@ -4,6 +4,9 @@ import pandas as pd
 import constants
 import view.backtest_view as view
 
+import matplotlib
+matplotlib.use('Agg')  #main쓰레드 아니여도 사용가능 하도록
+import matplotlib.pyplot as plt
 
 class Kiwoom_BackTesting:
 
@@ -11,7 +14,7 @@ class Kiwoom_BackTesting:
         self.Kiwoom = main_kiwoom
 
     # 볼린저 밴드 값
-    def plot_bollinger_bands(self, data_list, n=20, k=2):
+    def plot_bollinger_bands(self, data_list, n, k):
         columns = ['time', 'current', 'open', 'high', 'low', 'volume']
         df = pd.DataFrame(data_list, columns=columns)
 
@@ -21,11 +24,9 @@ class Kiwoom_BackTesting:
         df["lower"] = df["ma"] - (df["std"] * k)
         df = df[n - 1:].copy()
 
-        # # col 생략 없이 출력
-        # pd.set_option('display.max_columns', None)
-        # print(df)
 
-        return df
+        df_sorted_by_index = df.sort_index(ascending=False)
+        return df_sorted_by_index
 
 
     # 그래프로 만들기
@@ -36,12 +37,13 @@ class Kiwoom_BackTesting:
         plt.plot(df.index, df['ma'], linestyle='dashed', label=f'Moving Average {n}')
         plt.plot(df.index, df['lower'], linestyle='dashed', label='Lower band')
         plt.legend(loc='best')
-        plt.savefig('test.png')
+        plt.savefig('hong.png')
 
 
     # 볼린저로만 테스트
-    def bollinger_backtesting(self,item_code, time_type, data_list, target_per, target_sell_per):
-        df = self.plot_bollinger_bands(data_list)
+    def bollinger_backtesting(self,item_code, time_type, data_list, target_per, target_sell_per, bollinger_n, bollinger_k):
+        df = self.plot_bollinger_bands(data_list, bollinger_n, bollinger_k)
+
 
         buy_price = 0.0
         myasset = 10000
@@ -60,7 +62,7 @@ class Kiwoom_BackTesting:
 
         for i, row in df.iterrows():
             # 매수 조건 - 볼린저밴드 하단에 닿을 때
-
+            print(row['time'])
             if count == 20:
                 break
             if row['low'] <= row['lower'] and buy == False:

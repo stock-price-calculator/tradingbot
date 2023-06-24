@@ -44,6 +44,15 @@ class Kiwoom:
 
         self.return_list = []  #결과값 리턴할 리스트
 
+        self.real_item_code =None  # 종목코드
+        self.real_time_type = None  # 분봉, 일봉, 주봉
+        self.real_trade_parm = None  # 시작시간 or 분봉타입
+        self.real_profit_ratio = None  # 익절
+        self.real_loss_ratio = None  # 손절
+        self.real_bollinger_n = None
+        self.real_bollinger_k = None
+        self.real_total_data = None  # 이전 데이터
+
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
         self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")
@@ -151,9 +160,8 @@ class Kiwoom:
 
             if not self.remained_data:
                 time.sleep(0.5)
+                print("끝남")
                 self.continuous_data_success = True
-                # self.receive_backtest.bollinger_backtesting(constants.SAMSUNG_CODE, 5, self.result_list, 1.02, 0.982)
-                # self.result_list.clear()
 
         elif sRQName == "주식일봉차트조회요청":
             data_list = self.receive_market_price.receive_day_chart_data(sTrCode, sRQName, sRecordName)
@@ -191,6 +199,7 @@ class Kiwoom:
             print("전일거래량대비 : " + self.get_comm_real_data(sJongmokCode, 26))
             print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
             print("-----------------------------------------")
+
 
     # tr요청 기본 함수
     # tr 데이터 정보 입력

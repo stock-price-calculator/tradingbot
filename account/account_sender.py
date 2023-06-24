@@ -97,6 +97,7 @@ class Kiwoom_Send_Account:
             Kiwoom.set_input_value(self.Kiwoom, "시작주문번호", "")
             Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌별주문체결내역상세요청", "opw00007", 0, "2000")
             time.sleep(0.2)
+
         time.sleep(0.5)
         self.wait_continuous_result()
         self.Kiwoom.continuous_data_success = False

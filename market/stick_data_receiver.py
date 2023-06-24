@@ -29,6 +29,7 @@ class Kiwoom_Receive_Market_price:
 
             received_data.append(
                 [standard_minute, abs(current_price), abs(open_price), abs(high_price), abs(low_price), volume])
+
         return received_data
         # view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
 
