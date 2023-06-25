@@ -58,6 +58,18 @@ class Kiwoom_Send_Account:
         if self.Kiwoom.data_success:
             return self.Kiwoom.return_list
 
+    # 추청예상자금
+    def send_calculation_account_mystock(self, account):
+        Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
+        Kiwoom.set_input_value(self.Kiwoom, "비밀번호", "0000")
+        Kiwoom.set_input_value(self.Kiwoom, "상장폐지조회구분 ", ""0)
+        Kiwoom.send_comm_rq_data(self.Kiwoom, "추정자산조회요청 ", "opw00003 ", "0", "2000")
+
+        self.wait_result()
+
+        if self.Kiwoom.data_success:
+            return self.Kiwoom.return_list
+
     # 계좌평가잔고내역요청 - 총수익률
     def send_detail_account_mystock(self, account, sPrevNext="2"):
         self.Kiwoom.return_list.clear()  # 결과리스트 초기화
