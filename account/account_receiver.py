@@ -24,11 +24,10 @@ class Kiwoom_Receive_Account:
 
     # 추정자산조회요청
     def receive_calculation_account_money(self, sTrCode, sRQName):
-        print("값을 받기는 했음")
         calculation_value = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "추정예탁자산").strip()
 
         self.Kiwoom.return_list.append({
-            "추정예상자금": calculation_value
+            "추정예상자금": int(calculation_value)
         })
         
         self.Kiwoom.data_success = True

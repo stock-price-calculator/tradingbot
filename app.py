@@ -1,3 +1,4 @@
+import json
 import sys
 import time
 
@@ -14,16 +15,14 @@ from realtime.trading import Kiwoom_Real_trade
 from flask_restx import Api, Resource, reqparse
 from flask_cors import CORS
 
-
 app = Flask(__name__)
 
-CORS(app,  resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # api swagger
 api = Api(app, version='1.0', title='API 문서', description='Swagger 문서', doc="/api-docs")
 
 test_api = api.namespace('test', description='조회 API')
-
 
 kiwoom = None
 kiwoom_account = None
@@ -63,7 +62,6 @@ def get_login():
 # 유저 이름, 계좌, id
 @app.route("/user/information", methods=['GET'])
 def get_user_data():
-
     id = kiwoom.get_login_info("USER_ID")
     name = kiwoom.get_login_info("USER_NAME")
     account = kiwoom.get_login_info("ACCNO")
@@ -90,21 +88,28 @@ def get_user_money():
 def get_user_mystock_money():
     result = kiwoom_account.send_detail_account_mystock(constants.ACCOUNT)
 
+    result_data = result[:]
+
+    calculation_money = kiwoom_account.send_calculation_account_money(constants.ACCOUNT)
+
+    result_data[0]["추정예산자금"] = calculation_money[0].get("추정예상자금")
+
+
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
-        return jsonify(result)
+        return jsonify(result_data)
 
-# 추정예산자금 
+
+# 추정예산자금
 @app.route("/user/account/total_money", methods=['GET'])
 def get_user_total_money():
-
     result = kiwoom_account.send_calculation_account_money(constants.ACCOUNT)
 
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
-        return jsonify(result)
+        return jsonify(result[0].get("추정예상자금"))
 
 
 # 계좌별주문체결내역상세요청 - 날짜별 체결내역 opw00007
@@ -135,6 +140,7 @@ def get_user_profit():
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result)
+
 
 # 체결요청
 @app.route("/user/account/conclusion", methods=['GET'])
@@ -220,6 +226,7 @@ def send_cancel_sell_order():
 
     return jsonify(cancel_sell_order)
 
+
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # 종목명 -> 종목코드로 변환
 @app.route("/market/item_code", methods=['POST'])
@@ -232,12 +239,13 @@ def send_item_list():
     item_code_list = kiwoom_price.get_total_market_code()
 
     # 이름 입력 -> 코드 리턴
-    result_name = kiwoom_price.find_item_name(item_code_list,item_name)
+    result_name = kiwoom_price.find_item_name(item_code_list, item_name)
 
     if result_name == 0:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result_name)
+
 
 # 주식 기본정보
 @app.route("/market/information", methods=['POST'])
@@ -274,11 +282,13 @@ def send_minute_backtest():
 
     total_data = kiwoom_price.send_minutes_chart_data(item_code, minute_type)
     print("분봉 데이터 완료")
-    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, total_data, profit_ratio, loss_ratio,bollinger_n, bollinger_k)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, minute_type, total_data, profit_ratio, loss_ratio,
+                                                   bollinger_n, bollinger_k)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result)
+
 
 # 일봉 백테스팅
 @app.route("/backtest/day", methods=['POST'])
@@ -296,11 +306,13 @@ def send_day_backtest():
     # start_date = 20230505 라면 20200101 ~ 2023.05.05 까지의 데이터를 가져옴
     total_data = kiwoom_price.send_day_chart_data(item_code, start_date)
     print("일봉 데이터 완료")
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, bollinger_n, bollinger_k)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio,
+                                                   bollinger_n, bollinger_k)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result)
+
 
 # 주봉 백테스팅
 @app.route("/backtest/week", methods=['POST'])
@@ -317,11 +329,13 @@ def send_week_backtest():
 
     total_data = kiwoom_price.send_week_chart_data(item_code, start_date)
     print("주봉 데이터 완료")
-    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio, bollinger_n,bollinger_k)
+    result = kiwoom_backtest.bollinger_backtesting(item_code, time_type, total_data, profit_ratio, loss_ratio,
+                                                   bollinger_n, bollinger_k)
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})
     else:
         return jsonify(result)
+
 
 #
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -329,14 +343,12 @@ def send_week_backtest():
 
 @app.route("/real_trading_start", methods=['POST'])
 def start_real_trading():
-
     # 화면번호, 종목코드, 등록할 FID, 종목코드, 시간타입, 익절, 손절, 볼린저n , k
     # kiwoom_real_trading.SetRealReg("0111", item_code, "10", "0", time_type, 2.03, 0.982, 20, 2)
 
-
     data = request.get_json()
     item_code = data['item_code']
-    time_type = data['time_type'] # 분봉, 일봉, 주봉
+    time_type = data['time_type']  # 분봉, 일봉, 주봉
     profit_ratio = data['profit_ratio']
     loss_ratio = data['loss_ratio']
     bollinger_n = data['bollinger_n']
@@ -353,12 +365,13 @@ def start_real_trading():
 
     print("실시간 매매 값 받아오기 끝")
 
-    result_list = kiwoom_backtest.plot_bollinger_bands(total_data,bollinger_n,bollinger_k)
+    result_list = kiwoom_backtest.plot_bollinger_bands(total_data, bollinger_n, bollinger_k)
 
     # 그래프로 만들기
-    kiwoom_backtest.set_graph(result_list,bollinger_n)
+    kiwoom_backtest.set_graph(result_list, bollinger_n)
 
-    kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n, bollinger_k,total_data)
+    kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n,
+                                      bollinger_k, total_data)
 
     # kiwoom_real_trading.SetRealReg(item_code)
     # kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")
@@ -371,7 +384,8 @@ def start_real_trading():
 def stop_real_trading():
     kiwoom_real_trading.stop_real_trading()  # Set up real-time data subscription
 
-    return jsonify({"result":"실시간 매매 종료"})
+    return jsonify({"result": "실시간 매매 종료"})
+
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
