@@ -93,10 +93,13 @@ class Kiwoom_Send_Account:
         print("체결내역 서버에 요청")
 
         self.Kiwoom.return_list.clear()
+
         # term기간만큼 이전날짜 가져옴
         all_date = get_trading_record_date(term)
 
         for day in reversed(all_date):
+            print("날짜:",day)
+            self.Kiwoom.opw0007 = day
             Kiwoom.set_input_value(self.Kiwoom, "주문일자", day)
             Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
             Kiwoom.set_input_value(self.Kiwoom, "비밀번호", "0000")

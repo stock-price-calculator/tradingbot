@@ -53,6 +53,8 @@ class Kiwoom:
         self.real_bollinger_k = None
         self.real_total_data = None  # 이전 데이터
 
+        self.opw0007 = None
+
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
         self.ocx = QAxWidget("KHOPENAPI.KHOpenAPICtrl.1")

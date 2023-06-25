@@ -2,6 +2,7 @@ import view.account_view as view
 import json
 import time
 
+
 class Kiwoom_Receive_Account:
 
     def __init__(self, main_kiwoom):
@@ -16,8 +17,8 @@ class Kiwoom_Receive_Account:
 
         self.Kiwoom.return_list.append({
             "예수금": deposit,
-            "출금가능금액" :ok_deposit,
-            "주문가능금액" :buy_deposit
+            "출금가능금액": ok_deposit,
+            "주문가능금액": buy_deposit
         })
         view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
         self.Kiwoom.data_success = True
@@ -29,7 +30,7 @@ class Kiwoom_Receive_Account:
         self.Kiwoom.return_list.append({
             "추정예상자금": int(calculation_value)
         })
-        
+
         self.Kiwoom.data_success = True
 
     # 계좌평가잔고내역요청 값 받기
@@ -42,17 +43,15 @@ class Kiwoom_Receive_Account:
         total_profit_money = (self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총평가손익금액").strip())
         total_profit_loss_rate = (self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "총수익률(%)").strip())
 
-
         self.Kiwoom.return_list.append({
             "총매입금액": (total_buy_money),
             "총수익률": (total_profit_loss_rate),
-            "총평가금액" : (total_evaluation_money),
-            "총평가손익금액" :(total_profit_money),
+            "총평가금액": (total_evaluation_money),
+            "총평가손익금액": (total_profit_money),
         })
 
         # view.계좌평가잔고내역요청출력(total_buy_money,total_profit_loss_rate)
         # print(total_evaluation_money,total_profit_money)
-
 
         for i in range(repeat):
             item_code = self.Kiwoom.get_comm_data(sTrCode, sRQName, i, "종목코드").strip()
@@ -88,7 +87,6 @@ class Kiwoom_Receive_Account:
                 self.Kiwoom.return_list.append(list)
         self.Kiwoom.data_success = True
 
-
     # 계좌별주문체결내역상세요청 값 받기
     def receive_trading_record(self, sTrCode, sRQName, sRecordName):
         # self.Kiwoom.return_list.clear()  # 결과리스트 초기화
@@ -103,7 +101,7 @@ class Kiwoom_Receive_Account:
             trade_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "체결수량").strip()
             trade_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "체결단가").strip()
             order_type = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "매매구분").strip()
-
+            cnt += 1
             if order_number != "" and order_number is not None:
                 view.계좌별주문체결내역상세요청출력(order_number, item_code, item_name, trade_time, trade_count, trade_price,
                                      order_type)
@@ -115,9 +113,11 @@ class Kiwoom_Receive_Account:
                     "체결수량": trade_count,
                     "체결단가": trade_price,
                     "매매구분": order_type,
-                    "주문구분": order_kind
+                    "주문구분": order_kind,
+                    "순번": cnt,
+                    "날짜": self.Kiwoom.opw0007
                 })
-            time.sleep(0.3)
+            time.sleep(0.1)
         self.Kiwoom.data_success = True
 
     # 10085 계좌수익률요청
@@ -130,11 +130,12 @@ class Kiwoom_Receive_Account:
             item_name = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "종목명").strip()
             trade_price = abs(int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "현재가").strip()))
             trade_buy_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "매입가").strip()
-            trade_total_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName,i, "매입금액").strip()
+            trade_total_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "매입금액").strip()
             item_buy_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "보유수량").strip()
 
             if trade_time != "" and trade_time is not None:
-                view.계좌수익률요청(trade_time, item_code, item_name, trade_price, trade_buy_price, trade_total_price, item_buy_count)
+                view.계좌수익률요청(trade_time, item_code, item_name, trade_price, trade_buy_price, trade_total_price,
+                             item_buy_count)
                 self.Kiwoom.return_list.append({
                     "일자": trade_time,
                     "종목코드": item_code,
@@ -167,9 +168,8 @@ class Kiwoom_Receive_Account:
             })
         self.Kiwoom.data_success = True
 
-
     # opt10074 일자별실현손익요청
-    def receive_day_earn_data(self,sTrCode, sRQName, sRecordName):
+    def receive_day_earn_data(self, sTrCode, sRQName, sRecordName):
         repeat = self.Kiwoom.get_repeat_cnt(sTrCode, sRQName)
 
         total_buy_money = self.Kiwoom.get_comm_data(sTrCode, sRecordName, 0, "총매수금액").strip()
@@ -195,7 +195,7 @@ class Kiwoom_Receive_Account:
             day_trade_tax = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "당일매매세금").strip()
 
             if date != "" and date is not None:
-                list =[]
+                list = []
 
                 list.append({
                     "일자": date,
