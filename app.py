@@ -340,6 +340,7 @@ def start_real_trading():
         total_data = kiwoom_price.send_day_chart_data(item_code, get_parm)
     else:
         total_data = kiwoom_price.send_week_chart_data(item_code, get_parm)
+
     print(total_data)
     print("값 받아오기 끝")
 

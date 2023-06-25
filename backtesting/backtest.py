@@ -102,10 +102,10 @@ class Kiwoom_BackTesting:
 
         return {
             "종목코드": item_code,
-            "거래막대 타입": time_type,
+            "거래막대타입": time_type,
             "퍼센트": per,
             "내자산": myasset,
-            "거래 수": count,
+            "거래수": count,
             "이득": win_count,
             "손해" : count - win_count,
         }
