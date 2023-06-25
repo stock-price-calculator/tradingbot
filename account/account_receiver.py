@@ -22,7 +22,15 @@ class Kiwoom_Receive_Account:
         view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
         self.Kiwoom.data_success = True
 
+    # 추정자산조회요청
+    def receive_calculation_account_money(self, sTrCode, sRQName):
+        calculation_value = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "추정예탁자산").strip()
 
+        self.Kiwoom.return_list.append({
+            "추정예상자금": int(calculation_value)
+        })
+        
+        self.Kiwoom.data_success = True
 
     # 계좌평가잔고내역요청 값 받기
     def receive_detail_account_mystock(self, sTrCode, sRQName):
@@ -37,7 +45,7 @@ class Kiwoom_Receive_Account:
 
         self.Kiwoom.return_list.append({
             "총매입금액": (total_buy_money),
-            "총수익률(%)": (total_profit_loss_rate),
+            "총수익률": (total_profit_loss_rate),
             "총평가금액" : (total_evaluation_money),
             "총평가손익금액" :(total_profit_money),
         })
