@@ -133,6 +133,8 @@ class Kiwoom:
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
             self.receive_account.receive_detail_account_info(sTrCode, sRQName)
+        elif sRQName == "추정자산조회요청":
+            self.receive_account.receive_calculation_account_money(sTrCode, sRQName)
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
             self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)

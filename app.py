@@ -96,10 +96,10 @@ def get_user_mystock_money():
         return jsonify(result)
 
 # 추정예산자금 
-@app.route("/user/account/total_mystock", methods=['GET'])
+@app.route("/user/account/total_money", methods=['GET'])
 def get_user_total_money():
 
-    result = kiwoom_account.send_detail_account_mystock(constants.ACCOUNT)
+    result = kiwoom_account.send_calculation_account_money(constants.ACCOUNT)
 
     if not result:
         return jsonify({"result": "정보를 불러오는데 실패했습니다."})

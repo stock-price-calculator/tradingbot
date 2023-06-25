@@ -41,6 +41,7 @@ class Kiwoom_Send_Account:
             QCoreApplication.processEvents()
             time.sleep(0.2)
             if self.Kiwoom.return_list:
+                print("루프종료")
                 self.Kiwoom.data_success = True
 
     # 예수금상세현황요청
@@ -58,16 +59,19 @@ class Kiwoom_Send_Account:
         if self.Kiwoom.data_success:
             return self.Kiwoom.return_list
 
-    # 추청예상자금
-    def send_calculation_account_mystock(self, account):
+    # 추정자산조회요청
+    def send_calculation_account_money(self, account):
+        self.Kiwoom.return_list.clear()
+        print("추정자삭 요청 시작")
         Kiwoom.set_input_value(self.Kiwoom, "계좌번호", account)
         Kiwoom.set_input_value(self.Kiwoom, "비밀번호", "0000")
-        Kiwoom.set_input_value(self.Kiwoom, "상장폐지조회구분 ", ""0)
-        Kiwoom.send_comm_rq_data(self.Kiwoom, "추정자산조회요청 ", "opw00003 ", "0", "2000")
-
+        Kiwoom.set_input_value(self.Kiwoom, "상장폐지조회구분", "0")
+        Kiwoom.send_comm_rq_data(self.Kiwoom, "추정자산조회요청", "opw00003 ", "0", "2000")
+        print("추정자삭 요청 끝")
         self.wait_result()
 
         if self.Kiwoom.data_success:
+            print("루프 종료")
             return self.Kiwoom.return_list
 
     # 계좌평가잔고내역요청 - 총수익률
@@ -80,7 +84,6 @@ class Kiwoom_Send_Account:
         Kiwoom.set_input_value(self.Kiwoom, "조회구분", "2")
         Kiwoom.send_comm_rq_data(self.Kiwoom, "계좌평가잔고내역요청", "opw00018", "0", "2000")
 
-        print("정보를 보냄")
         self.wait_continuous_result()
         self.Kiwoom.continuous_data_success = False
 
