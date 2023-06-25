@@ -144,7 +144,7 @@ def get_total_price(code: str, total_price: [int]) -> None:  # 시가 총액 가
 
 
 # 시가 총액 구하기
-def init_driver(strategy: Union[None | str] = "eager"):
+def init_driver(strategy = "eager"):
     options = Options()
     options.page_load_strategy = strategy
     options.add_argument("headless")

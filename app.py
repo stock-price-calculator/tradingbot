@@ -1,7 +1,7 @@
 import json
 import sys
 import time
-
+import numpy as np
 from PyQt5.QtWidgets import *
 from flask import Flask, jsonify, request, render_template
 import constants
@@ -88,6 +88,11 @@ def get_user_money():
 # 계좌평가잔고내역요청 - 총수익률,총 매입금액, 수익률
 @app.route("/user/account/mystock", methods=['GET'])
 def get_user_mystock_money():
+
+
+    if kiwoom.return_list:
+        time.sleep(1)
+
     result = kiwoom_account.send_detail_account_mystock(constants.ACCOUNT)
 
     result_data = result[:]
@@ -157,10 +162,14 @@ def get_user_conclusion():
 # 일자별실현손익요청
 @app.route("/user/account/day-profit", methods=['POST'])
 def get_user_day_profit():
+
     data = request.get_json()
 
     start_day = data['start_day']
     last_day = data['last_day']
+
+    if kiwoom.return_list:
+        time.sleep(1)
 
     result = kiwoom_account.send_day_earn_data(constants.ACCOUNT, start_day, last_day)
     if not result:
@@ -396,6 +405,7 @@ def get_price():
     code = request.args.get("code")
     results: [EPS] = calculateEPS(code)
     price = results[len(results) - 1].sp_eps * 10
+    price = np.round(price, -1)
     return jsonify({
         "result": price
     })

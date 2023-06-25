@@ -98,6 +98,7 @@ class Kiwoom_Receive_Account:
             order_number = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "주문번호").strip()
             item_code = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "종목번호").strip()
             item_name = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "종목명").strip()
+            order_kind = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "주문구분").strip()
             trade_time = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "주문시간").strip()
             trade_count = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "체결수량").strip()
             trade_price = self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "체결단가").strip()
@@ -113,7 +114,8 @@ class Kiwoom_Receive_Account:
                     "주문시간": trade_time,
                     "체결수량": trade_count,
                     "체결단가": trade_price,
-                    "매매구분": order_type
+                    "매매구분": order_type,
+                    "주문구분": order_kind
                 })
             time.sleep(0.3)
         self.Kiwoom.data_success = True
