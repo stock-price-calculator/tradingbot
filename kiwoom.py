@@ -52,6 +52,7 @@ class Kiwoom:
         self.real_bollinger_n = None
         self.real_bollinger_k = None
         self.real_total_data = None  # 이전 데이터
+        self.real_can_buy_money = None
 
         self.opw0007 = None
 

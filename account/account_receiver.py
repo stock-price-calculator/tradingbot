@@ -14,12 +14,12 @@ class Kiwoom_Receive_Account:
         deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "예수금").strip()
         ok_deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "출금가능금액").strip()
         buy_deposit = self.Kiwoom.get_comm_data(sTrCode, sRQName, 0, "주문가능금액").strip()
-
         self.Kiwoom.return_list.append({
             "예수금": deposit,
             "출금가능금액": ok_deposit,
             "주문가능금액": buy_deposit
         })
+
         view.예수금상세현황요청출력(ok_deposit, deposit, buy_deposit)
         self.Kiwoom.data_success = True
 

@@ -381,9 +381,13 @@ def start_real_trading():
     # 그래프로 만들기
     kiwoom_backtest.set_graph(result_list, bollinger_n)
 
+    # 매수 가능 금액
+    can_buy_money = kiwoom_account.send_detail_account_info(constants.ACCOUNT)
+
+
     # 초기설정
     kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n,
-                                      bollinger_k, result_list, balance)
+                                      bollinger_k, result_list, balance, abs(int(can_buy_money[0].get("주문가능금액"))))
 
     kiwoom_real_trading.real_trade_start()
 
@@ -446,7 +450,7 @@ def run_kiwoom_app():
     kiwoom_trade = Kiwoom_Trade(kiwoom)
     kiwoom_price = Kiwoom_Price(kiwoom)
     kiwoom_backtest = Kiwoom_BackTesting(kiwoom)
-    kiwoom_real_trading = Kiwoom_Real_trade(kiwoom, kiwoom_trade)
+    kiwoom_real_trading = Kiwoom_Real_trade(kiwoom, kiwoom_trade, kiwoom_account)
     app1.exec_()
 
 
