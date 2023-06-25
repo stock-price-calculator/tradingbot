@@ -27,10 +27,13 @@ from market.stick_data_sender import Kiwoom_Price
 
 
 class Kiwoom_Real_trade:
-    def __init__(self, main_kiwoom):
+    def __init__(self, main_kiwoom, kiwoom_trade):
         self.kiwoom = main_kiwoom
+        self.kiwoom_trade = kiwoom_trade
         self.connect_event()
         self.realtime_event_loop = QEventLoop()
+        self.buy = False # 이미 구매를 했는지
+        self.buy_price = -1 # 구매가격
 
     # 이벤트 요청 연결
     def connect_event(self):
@@ -57,6 +60,7 @@ class Kiwoom_Real_trade:
                 print("asdfasdf")
             print("-----------------------------------------")
 
+
         # print("전일대비 : " + self.get_comm_real_data(sJongmokCode, 11))
         # print("등락율 : " + self.get_comm_real_data(sJongmokCode, 12))
         # print("매도호가 : " + self.get_comm_real_data(sJongmokCode, 27))
@@ -71,6 +75,35 @@ class Kiwoom_Real_trade:
     # 실시간 매매 시작
     def real_trade_start(self, current_price):
         # 몇 분봉,  익절,  손절 , 종목코드
+
+        data = self.kiwoom.real_total_data.iloc[-1]
+        print("upper : ", data['upper'])
+        print("lower : ", data['lower'])
+        print("current : ", current_price)
+
+        if self.buy == False:
+
+            if current_price < data['lower']:
+                # 매매
+                self.buy = True
+                self.buy_price = current_price
+                self.kiwoom_trade.send_buy_order(constants.ACCOUNT,self.kiwoom.real_item_code, 12, 0,"시장가")
+        else:  # upper에 닿았을때 , 익절 퍼센트 달성   // 손절 퍼센트 달성
+            if current_price >= data['upper']:
+                # 볼린저밴드 익절
+                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_cod, 12, 0, "시장가")
+                self.buy = False
+            elif current_price >= self.buy_price (1 + self.kiwoom.real_profit_ratio / 100):
+                # 목표가 익절
+                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_cod, 12, 0, "시장가")
+                self.buy = False
+            elif current_price <= data['lower']:
+                # 목표 손절
+                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_cod, 12, 0, "시장가")
+                self.buy = False
+
+
+
 
     # 실시간 등록
     def SetRealReg(self, item_code):

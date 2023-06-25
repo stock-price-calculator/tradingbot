@@ -41,7 +41,6 @@ class Kiwoom_Send_Account:
             QCoreApplication.processEvents()
             time.sleep(0.2)
             if self.Kiwoom.return_list:
-                print("루프종료")
                 self.Kiwoom.data_success = True
 
     # 예수금상세현황요청

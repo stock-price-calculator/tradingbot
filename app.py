@@ -372,10 +372,9 @@ def start_real_trading():
 
     # 초기설정
     kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n,
-                                      bollinger_k, total_data, balance)
+                                      bollinger_k, result_list, balance)
 
-    kiwoom_real_trading.real_trade_start()
-    # kiwoom_real_trading.SetRealReg(item_code)
+    kiwoom_real_trading.real_trade_start(70000)
     # kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")
 
     return jsonify({"result": "실시간매매 시작."})
@@ -414,7 +413,7 @@ def run_kiwoom_app():
     kiwoom_trade = Kiwoom_Trade(kiwoom)
     kiwoom_price = Kiwoom_Price(kiwoom)
     kiwoom_backtest = Kiwoom_BackTesting(kiwoom)
-    kiwoom_real_trading = Kiwoom_Real_trade(kiwoom)
+    kiwoom_real_trading = Kiwoom_Real_trade(kiwoom, kiwoom_trade)
     app1.exec_()
 
 
