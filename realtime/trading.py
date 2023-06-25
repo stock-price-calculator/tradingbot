@@ -70,17 +70,17 @@ class Kiwoom_Real_trade:
 
     # 실시간 매매 시작
     def real_trade_start(self, current_price):
-        # 몇 분봉,  익절,  손절,  볼린저밴드 값1, 볼린저밴드 값2, 종목코드
-        a = 123
+        # 몇 분봉,  익절,  손절 , 종목코드
 
     # 실시간 등록
     def SetRealReg(self, item_code):
         self.kiwoom.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
                              "0111", item_code, "10", "0")
-        print("등록완료")
 
         self.realtime_event_loop.exec_()
-    def setPreTrading(self,  item_code,time_type, trade_parm, profit_ratio, loss_ratio, bollinger_n, bollinger_k,total_data):
+
+    def setPreTrading(self, item_code, time_type, trade_parm, profit_ratio, loss_ratio, bollinger_n, bollinger_k,
+                      total_data, balance):
         self.kiwoom.real_item_code = item_code  # 종목코드
         self.kiwoom.real_time_type = time_type  # 분봉, 일봉, 주봉
         self.kiwoom.real_trade_parm = trade_parm  # 시작시간 or 분봉타입
@@ -89,7 +89,8 @@ class Kiwoom_Real_trade:
         self.kiwoom.real_bollinger_n = bollinger_n
         self.kiwoom.real_bollinger_k = bollinger_k
         self.kiwoom.real_total_data = total_data  # 이전 데이터
-        print("지금 설정완료")
+        self.kiwoom.real_balance = balance
+        print("실시간 매매 초기 설정완료")
     def get_comm_real_data(self, item_code, fid):
         return self.kiwoom.ocx.dynamicCall("GetCommRealData(QString,int)",item_code, fid)
 

@@ -354,7 +354,7 @@ def start_real_trading():
     bollinger_n = data['bollinger_n']
     bollinger_k = data['bollinger_k']
     get_parm = data['get_parm']  # 분봉일때는 분봉타입, 일봉, 주봉일 때는 start_date
-
+    balance = data['balance']  # 투자할 총 금액
     # time_type마다 분리
     if time_type == "minute":
         total_data = kiwoom_price.send_minutes_chart_data(item_code, get_parm)
@@ -364,15 +364,17 @@ def start_real_trading():
         total_data = kiwoom_price.send_week_chart_data(item_code, get_parm)
 
     print("실시간 매매 값 받아오기 끝")
-
+    # 볼린저값 리스트
     result_list = kiwoom_backtest.plot_bollinger_bands(total_data, bollinger_n, bollinger_k)
 
     # 그래프로 만들기
     kiwoom_backtest.set_graph(result_list, bollinger_n)
 
+    # 초기설정
     kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n,
-                                      bollinger_k, total_data)
+                                      bollinger_k, total_data, balance)
 
+    kiwoom_real_trading.real_trade_start()
     # kiwoom_real_trading.SetRealReg(item_code)
     # kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")
 
