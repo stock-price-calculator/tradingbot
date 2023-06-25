@@ -35,6 +35,8 @@ class Kiwoom_Real_trade:
         self.buy = False # 이미 구매를 했는지
         self.buy_price = -1 # 구매가격
 
+        self.real_current_price = 70000
+
     # 이벤트 요청 연결
     def connect_event(self):
         self.kiwoom.ocx.OnReceiveRealData.connect(self.receive_realdata)
@@ -47,16 +49,16 @@ class Kiwoom_Real_trade:
     def receive_realdata(self, sJongmokCode, sRealType, sRealData):
 
         if sRealType == "주식체결":
-            currnet_price = self.get_comm_real_data(sJongmokCode, 10)
+            self.real_current_price = self.get_comm_real_data(sJongmokCode, 10)
+
             print("----------------------------------------")
-            print("현재가 : " + currnet_price)
+            print("현재가 : " + self.real_current_price)
             print(self.kiwoom.real_item_code)
             print(self.kiwoom.real_time_type)
             print(self.kiwoom.real_profit_ratio)
             # print(self.kiwoom.real_loss_ratio)
             # print(self.kiwoom.real_bollinger_n)
-
-            if currnet_price == "+" + str(71600):
+            if self.real_current_price == "+" + str(71600):
                 print("asdfasdf")
             print("-----------------------------------------")
 
@@ -73,33 +75,34 @@ class Kiwoom_Real_trade:
         # print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
 
     # 실시간 매매 시작
-    def real_trade_start(self, current_price):
+    def real_trade_start(self):
         # 몇 분봉,  익절,  손절 , 종목코드
 
         data = self.kiwoom.real_total_data.iloc[-1]
         print("upper : ", data['upper'])
         print("lower : ", data['lower'])
-        print("current : ", current_price)
+        print("current : ",  self.real_current_price)
 
         if self.buy == False:
 
-            if current_price < data['lower']:
+            if self.real_current_price < data['lower']:
+
                 # 매매
                 self.buy = True
-                self.buy_price = current_price
+                self.buy_price =  self.real_current_price
                 self.kiwoom_trade.send_buy_order(constants.ACCOUNT,self.kiwoom.real_item_code, 12, 0,"시장가")
         else:  # upper에 닿았을때 , 익절 퍼센트 달성   // 손절 퍼센트 달성
-            if current_price >= data['upper']:
-                # 볼린저밴드 익절
-                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_cod, 12, 0, "시장가")
+            if self.real_current_price >= data['upper']:
+                print("볼린저밴드 익절")
+                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_code, 12, 0, "시장가")
                 self.buy = False
-            elif current_price >= self.buy_price (1 + self.kiwoom.real_profit_ratio / 100):
-                # 목표가 익절
-                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_cod, 12, 0, "시장가")
+            elif self.real_current_price >= self.buy_price * (1 + self.kiwoom.real_profit_ratio / 100):
+                print("목표가 익절")
+                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_code, 12, 0, "시장가")
                 self.buy = False
-            elif current_price <= data['lower']:
-                # 목표 손절
-                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_cod, 12, 0, "시장가")
+            elif self.real_current_price <= data['lower']:
+                print("목표가 손절")
+                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_code, 12, 0, "시장가")
                 self.buy = False
 
 

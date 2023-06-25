@@ -385,11 +385,22 @@ def start_real_trading():
     kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n,
                                       bollinger_k, result_list, balance)
 
-    kiwoom_real_trading.real_trade_start(70000)
+    kiwoom_real_trading.real_trade_start()
+
     # kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")
 
     return jsonify({"result": "실시간매매 시작."})
 
+@app.route("/real_trading_current_price", methods=['POST'])
+def set_real_trading_current_price():
+    data = request.get_json()
+
+    current_price = data['current_price']
+
+    kiwoom_trade.real_current_price = current_price
+    kiwoom_real_trading.real_trade_start()
+
+    return jsonify({"result": "현재값 변경 완료"})
 
 # 실시간 매매 종료
 @app.route("/real_trading_stop", methods=['GET'])
