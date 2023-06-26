@@ -18,6 +18,8 @@ class Kiwoom_Receive_Market_price:
 
         received_data = []
 
+        repeat = 1
+
         for i in range(repeat):
             current_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "현재가").strip())
             volume = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "거래량").strip())
@@ -29,7 +31,7 @@ class Kiwoom_Receive_Market_price:
 
             received_data.append(
                 [standard_minute, abs(current_price), abs(open_price), abs(high_price), abs(low_price), volume])
-
+        print(received_data)
         return received_data
         # view.주식분봉차트조회요청(standard_minute, current_price, open_price, high_price, low_price, volume)
 
@@ -46,9 +48,9 @@ class Kiwoom_Receive_Market_price:
             high_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "고가").strip())
             low_price = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "저가").strip())
             standard_day = int(self.Kiwoom.get_comm_data(sTrCode, sRecordName, i, "일자").strip())
-
             received_data.append(
                 [standard_day, abs(current_price), abs(open_price), abs(high_price), abs(low_price), volume])
+        print(received_data)
         return received_data
             # view.주식일봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
 
@@ -68,6 +70,7 @@ class Kiwoom_Receive_Market_price:
 
             received_data.append(
                 [standard_day, abs(current_price), abs(open_price), abs(high_price), abs(low_price), volume])
+        print(received_data)
         return received_data
             # view.주식주봉차트조회요청(standard_day, current_price, open_price, high_price, low_price, volume)
 

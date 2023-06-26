@@ -35,12 +35,13 @@ class Kiwoom_Real_trade:
         self.realtime_event_loop = QEventLoop()
         self.buy = False  # 이미 구매를 했는지
         self.buy_price = -1  # 구매가격
-
         self.real_current_price = 70000
         self.real_buy_quantity = 0
 
+
     # 이벤트 요청 연결
     def connect_event(self):
+        print("실시간 이벤트 연결")
         self.kiwoom.ocx.OnReceiveRealData.connect(self.receive_realdata)
 
     def stop_real_trading(self):
@@ -49,77 +50,68 @@ class Kiwoom_Real_trade:
 
     # 주식체결 받아오기
     def receive_realdata(self, sJongmokCode, sRealType, sRealData):
-
-        if sRealType == "주식체결":
-            self.real_current_price = self.get_comm_real_data(sJongmokCode, 10)
-
+        print(self.kiwoom.real_start)
+        if sRealType == "주식체결" and self.kiwoom.real_start == True:
+            self.real_current_price = str(self.get_comm_real_data(sJongmokCode, 10))
             print("----------------------------------------")
-            print("현재가 : " + self.real_current_price)
-            print(self.kiwoom.real_item_code)
-            print(self.kiwoom.real_time_type)
-            print(self.kiwoom.real_profit_ratio)
-            # print(self.kiwoom.real_loss_ratio)
-            # print(self.kiwoom.real_bollinger_n)
-            if self.real_current_price == "+" + str(71600):
-                print("asdfasdf")
+            print("현재가 : " + (self.real_current_price))
+            # print(self.kiwoom.real_item_code)
+            # print(self.kiwoom.real_time_type)
+            # print(self.kiwoom.real_profit_ratio)
+            # # print(self.kiwoom.real_loss_ratio)
+            # # print(self.kiwoom.real_bollinger_n)
             print("-----------------------------------------")
 
-        # print("전일대비 : " + self.get_comm_real_data(sJongmokCode, 11))
-        # print("등락율 : " + self.get_comm_real_data(sJongmokCode, 12))
-        # print("매도호가 : " + self.get_comm_real_data(sJongmokCode, 27))
-        # print("매수호가 : " + self.get_comm_real_data(sJongmokCode, 28))
-        # print("누적거래량 : " + self.get_comm_real_data(sJongmokCode, 13))
-        # print("시가 : " + self.get_comm_real_data(sJongmokCode, 16))
-        # print("고가 : " + self.get_comm_real_data(sJongmokCode, 17))
-        # print("저가 : " + self.get_comm_real_data(sJongmokCode, 18))
-        # print("전일거래량대비 : " + self.get_comm_real_data(sJongmokCode, 26))
-        # print("시가총액 : " + self.get_comm_real_data(sJongmokCode, 311))
+            self.real_trade_start(int(self.real_current_price))
 
     # 실시간 매매 시작
-    def real_trade_start(self):
+    def real_trade_start(self, current_price):
         # 몇 분봉,  익절,  손절 , 종목코드
 
         data = self.kiwoom.real_total_data.iloc[-1]
         print("upper : ", data['upper'])
         print("lower : ", data['lower'])
-        print("current : ", self.real_current_price)
+        print("current : ", current_price)
 
         if self.buy == False:
 
-            if self.real_current_price < data['lower']:
+            if current_price < data['lower']:
                 # 매매
                 self.buy = True
-                self.buy_price = self.real_current_price # 현재가
+                self.buy_price = current_price  # 현재가
 
-                self.real_buy_quantity = int(self.kiwoom.real_can_buy_money // self.real_current_price) # 매수 가능 수량
-                self.kiwoom_trade.send_buy_order(constants.ACCOUNT, self.kiwoom.real_item_code, self.real_buy_quantity, 0, "시장가")
+                self.real_buy_quantity = int(self.kiwoom.real_can_buy_money // current_price)  # 매수 가능 수량
+                self.kiwoom_trade.send_buy_order(constants.ACCOUNT, self.kiwoom.real_item_code, self.real_buy_quantity,
+                                                 0, "시장가")
 
                 # 매수가능 금액 업데이트
                 self.kiwoom.real_can_buy_money = self.kiwoom_account.send_detail_account_info(constants.ACCOUNT)
 
         else:  # upper에 닿았을때 , 익절 퍼센트 달성   // 손절 퍼센트 달성
 
-            if self.real_current_price >= data['upper'] or \
-                    self.real_current_price >= self.buy_price * (1 + self.kiwoom.real_profit_ratio / 100) or \
-                    self.real_current_price <= data['lower']:
+            if current_price >= data['upper'] or \
+                    current_price >= self.buy_price * (1 + self.kiwoom.real_profit_ratio / 100) or \
+                    current_price <= data['lower']:
 
-                if self.real_current_price >= data['upper']:
+                if current_price >= data['upper']:
                     print("볼린저밴드 익절")
-                elif self.real_current_price >= self.buy_price * (1 + self.kiwoom.real_profit_ratio / 100):
+                elif current_price >= self.buy_price * (1 + self.kiwoom.real_profit_ratio / 100):
                     print("목표가 익절")
-                elif self.real_current_price <= data['lower']:
+                elif current_price <= data['lower']:
                     print("목표가 손절")
                 # 매도
-                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_code, self.real_buy_quantity, 0, "시장가")
+                self.kiwoom_trade.send_sell_order(constants.ACCOUNT, self.kiwoom.real_item_code, self.real_buy_quantity,
+                                                  0, "시장가")
                 self.buy = False
+                self.buy_price = -1
                 # 매수 가능 금액 수정
                 self.kiwoom.real_can_buy_money = self.kiwoom_account.send_detail_account_info(constants.ACCOUNT)
 
-
     # 실시간 등록
     def SetRealReg(self, item_code):
+        print("실시간 연결 시작")
         self.kiwoom.ocx.dynamicCall("SetRealReg(QString, QString, QString, QString)",
-                                    "0111", item_code, "10", "0")
+                                    "0111", item_code, "10", 0)
 
         self.realtime_event_loop.exec_()
 

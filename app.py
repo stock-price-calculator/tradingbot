@@ -353,19 +353,21 @@ def send_week_backtest():
 # 실시간 매매
 
 @app.route("/real_trading_start", methods=['POST'])
-def start_real_trading():
+def start1_real_trading():
     # 화면번호, 종목코드, 등록할 FID, 종목코드, 시간타입, 익절, 손절, 볼린저n , k
     # kiwoom_real_trading.SetRealReg("0111", item_code, "10", "0", time_type, 2.03, 0.982, 20, 2)
 
     data = request.get_json()
+
     item_code = data['item_code']
     time_type = data['time_type']  # 분봉, 일봉, 주봉
     profit_ratio = data['profit_ratio']
     loss_ratio = data['loss_ratio']
     bollinger_n = data['bollinger_n']
     bollinger_k = data['bollinger_k']
-    get_parm = data['get_parm']  # 분봉일때는 분봉타입, 일봉, 주봉일 때는 start_date
+    get_parm = data['get_time']  # 분봉일때는 분봉타입, 일봉, 주봉일 때는 start_date
     balance = data['balance']  # 투자할 총 금액
+
     # time_type마다 분리
     if time_type == "minute":
         total_data = kiwoom_price.send_minutes_chart_data(item_code, get_parm)
@@ -374,26 +376,45 @@ def start_real_trading():
     else:
         total_data = kiwoom_price.send_week_chart_data(item_code, get_parm)
 
-    print("실시간 매매 값 받아오기 끝")
+    # result = kiwoom_backtest.bollinger_backtesting(item_code, "5", total_data, profit_ratio, loss_ratio,
+    #                                                bollinger_n, bollinger_k)
+
     # 볼린저값 리스트
     result_list = kiwoom_backtest.plot_bollinger_bands(total_data, bollinger_n, bollinger_k)
 
     # 그래프로 만들기
-    kiwoom_backtest.set_graph(result_list, bollinger_n)
+    # kiwoom_backtest.set_graph(result_list, bollinger_n)
 
     # 매수 가능 금액
     can_buy_money = kiwoom_account.send_detail_account_info(constants.ACCOUNT)
 
+    kiwoom.real_item_code = item_code  # 종목코드
+    kiwoom.real_time_type = time_type  # 분봉, 일봉, 주봉
+    kiwoom.real_trade_parm = get_parm  # 시작시간 or 분봉타입
+    kiwoom.real_profit_ratio = profit_ratio  # 익절
+    kiwoom.real_loss_ratio = loss_ratio  # 손절
+    kiwoom.real_bollinger_n = bollinger_n
+    kiwoom.real_bollinger_k = bollinger_k
+    kiwoom.real_total_data = result_list  # 이전 데이터
+    kiwoom.real_balance = balance
+    kiwoom.real_can_buy_money = abs(int(can_buy_money[0]["주문가능금액"]))
 
-    # 초기설정
-    kiwoom_real_trading.setPreTrading(item_code, time_type, get_parm, profit_ratio, loss_ratio, bollinger_n,
-                                      bollinger_k, result_list, balance, abs(int(can_buy_money[0].get("주문가능금액"))))
 
-    kiwoom_real_trading.real_trade_start()
+    result = 1
+    if not result:
+        return jsonify({"result": "정보를 불러오는데 실패했습니다."})
+    else:
+        return jsonify({"result": "자동매매 시작"})
 
-    # kiwoom_real_trading.SetRealReg("0111", "005930", "10", "0")
+@app.route("/start", methods=['POST'])
+def start():
+    data = request.get_json()
 
-    return jsonify({"result": "실시간매매 시작."})
+    item_code = data['item_code']
+    kiwoom.real_start = True
+
+    # kiwoom_real_trading.SetRealReg(item_code)
+    return jsonify({"result": "자동매매 시작"})
 
 @app.route("/real_trading_current_price", methods=['POST'])
 def set_real_trading_current_price():
