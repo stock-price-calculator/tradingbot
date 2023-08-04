@@ -52,6 +52,10 @@ class Kiwoom:
         self.real_bollinger_n = None
         self.real_bollinger_k = None
         self.real_total_data = None  # 이전 데이터
+        self.real_can_buy_money = None
+        self.real_start = False
+
+        self.opw0007 = None
 
     # 레지스트리에 저장된 키움 openAPI 모듈 불러오기
     def create_kiwoom_instance(self):
@@ -133,6 +137,8 @@ class Kiwoom:
         # 예수금 등 조회 하기
         if sRQName == "예수금상세현황요청":
             self.receive_account.receive_detail_account_info(sTrCode, sRQName)
+        elif sRQName == "추정자산조회요청":
+            self.receive_account.receive_calculation_account_money(sTrCode, sRQName)
         # 계좌평가 잔고
         elif sRQName == "계좌평가잔고내역요청":
             self.receive_account.receive_detail_account_mystock(sTrCode, sRQName)
@@ -156,11 +162,12 @@ class Kiwoom:
             self.receive_market_price.receive_market_information(sTrCode, sRQName, sRecordName)
         elif sRQName == "주식분봉차트조회요청":
             data_list = self.receive_market_price.receive_minutes_chart_data(sTrCode, sRQName, sRecordName)
+
             self.return_list += data_list
+            print(data_list)
 
             if not self.remained_data:
-                time.sleep(0.5)
-                print("끝남")
+                print("분봉차트 받아오기 이벤트 끝남")
                 self.continuous_data_success = True
 
         elif sRQName == "주식일봉차트조회요청":
@@ -168,7 +175,6 @@ class Kiwoom:
             self.return_list += data_list
 
             if not self.remained_data:
-                time.sleep(0.5)
                 self.continuous_data_success = True
 
         elif sRQName == "주식주봉차트조회요청":

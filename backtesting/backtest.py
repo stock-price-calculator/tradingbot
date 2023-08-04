@@ -62,9 +62,7 @@ class Kiwoom_BackTesting:
 
         for i, row in df.iterrows():
             # 매수 조건 - 볼린저밴드 하단에 닿을 때
-            print(row['time'])
-            if count == 20:
-                break
+            
             if row['low'] <= row['lower'] and buy == False:
                 buy = True
                 count += 1
@@ -87,7 +85,7 @@ class Kiwoom_BackTesting:
 
                 per = (sell_price - buy_price) / buy_price * 100 - constants.TRADE_CHARGE * 2
 
-                myasset = myasset + myasset * per /100
+                myasset = myasset + myasset * per /100 / 10000
 
                 print("------------------------------")
                 print("구매금액 : ", buy_price)
@@ -102,10 +100,10 @@ class Kiwoom_BackTesting:
 
         return {
             "종목코드": item_code,
-            "거래막대 타입": time_type,
+            "거래막대타입": time_type,
             "퍼센트": per,
-            "내자산": myasset,
-            "거래 수": count,
+            "수익률": myasset,
+            "거래수": count,
             "이득": win_count,
             "손해" : count - win_count,
         }
