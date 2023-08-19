@@ -1,13 +1,7 @@
-# tradingbot
-분봉 데이터 받을때 sPrevNext가 2일때 계속 요청해야함
-분봉 원하는 기간만큼 받아올수있는지
-
-
-마켓 트랜스미션에서 data_count 수 줄이면서 요청하고
-지금 문제인게
-
-kiwoom.py에서 remain_data가 false가 안되서 계속 요청되는 상황임
-
-0527 todo
-분봉테스트까진 기본적인건 구현 완료
-실시간 차트내역 받아오는거 부터 하기
+<h1 align="center">
+  <a href="https://github.com/rong5026/animal_user" title="AwesomeCV Documentation">
+    <img alt="AwesomeCV" src="https://github.com/Haehnchen/crypto-trading-bot/assets/77156858/83f08925-d43f-44e3-b523-e1037c4b3d29" width="100%" height="100%" />
+  </a>
+  <br />
+    
+</h1>
