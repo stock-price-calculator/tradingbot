@@ -22,7 +22,7 @@
 
 ## 📌 개요
 - 프로젝트 이름 : 웹 크롤링과 자연어분석을 통한 주식 자동매매 프로그램
-- 개발 배경 : 코인뿐만 아니라 주식까지도 자동매매를 제작해보고 싶어 기획하게 되었습니다.
+- 개발 배경 : 코인뿐만 아니라 주식까지도 자동매매를 제작해보고 싶어 기획하게 되었습니다. 
 - 개발 언어 : Python
 - 프론트 : React, Electron
 - 백엔드 : Flask, 키움증권 API
@@ -64,9 +64,9 @@
 
 ## 📌 프로젝트 메인 페이지
 
-|<img src="https://github.com/En-soso-com/Android/assets/77156858/8f73007e-c011-4b52-909d-c2288b7fe213" height="400" width="100%" >|<img src="https://github.com/En-soso-com/Android/assets/77156858/d6347840-4882-4c48-a2c1-439d100a4255" height="400" width="100%"> |<img src="https://github.com/En-soso-com/Android/assets/77156858/6e689579-1e00-4860-93c9-41977e50d961" height="400" width="100%"> |
-|:---:|:---:|:---:|
-|시작 화면|미팅 참여 화면|매칭 결과 화면|
+|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/b754f2bc-ebe4-4361-8a69-03c795336574" height="100%" width="100%">|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/a9461264-6c8a-425d-a5b4-21a9fc17fc9b"  height="100%" width="100%"> |
+|:---:|:---:|
+|시작 화면|미팅 참여 화면|
 
 ## 📌 프로젝트 안내 페이지
 
@@ -76,7 +76,7 @@
 
  
 ##  💾 백엔드 
-|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/89cc43da-9595-4dbb-927a-a46ab12f783f" height="400" width="100%" >|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/d113c323-e6f1-4b78-bfc4-9a07d881a5ca" height="400" width="100%" > |
+|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/89cc43da-9595-4dbb-927a-a46ab12f783f">|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/d113c323-e6f1-4b78-bfc4-9a07d881a5ca" height="400" width="100%" > |
 |:---:|:---:|
 |Firbase 사용1|Firbase 사용2|
 
