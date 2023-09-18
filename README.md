@@ -11,11 +11,13 @@
 <div align="center">
   <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=white"/>
 
-  <img src="https://img.shields.io/badge/javascript-F7DF1E?style=flat&logo=javascript&logoColor=white"/>
+<img src="https://img.shields.io/badge/Electron-47848F?style=flat&logo=Electron&logoColor=white"/>
 
-<img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=Firebase&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white"/>
 
-<img src="https://img.shields.io/badge/Teachable Machine-40AEF0?style=flat&logo=&logoColor=white"/>
+<img src="https://img.shields.io/badge/Flask-000000?style=flat&logo=Flask&logoColor=white"/>
+
+<img src="https://img.shields.io/badge/PyQt5-41CD52?style=flat&logo=Qt&logoColor=white"/>
   
 </div>
 <br />
@@ -63,27 +65,27 @@
 ### 4. 적정주가 계산기
 
 
-## 📌 프로젝트 메인 페이지
+## 📌 주식 자동매매 페이지
 
-|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/b754f2bc-ebe4-4361-8a69-03c795336574" height="100%" width="700">|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/a9461264-6c8a-425d-a5b4-21a9fc17fc9b"  height="100%" width="700"> |
+|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/b754f2bc-ebe4-4361-8a69-03c795336574" height="100%" width="700">|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/c5a0d662-c1bb-4e0a-b92e-96215a649267"  height="100%" width="700"> |
 |:---:|:---:|
-|시작 화면|미팅 참여 화면|
+|주문|자동매매|
 
-## 📌 프로젝트 안내 페이지
 
-|<img src="https://github.com/En-soso-com/Android/assets/77156858/c9fd6046-57d9-4138-8119-851625443e53" height="400" width="100%" >|<img src="https://github.com/En-soso-com/Android/assets/77156858/ad5f62a7-b9ff-45dc-bfe2-5c0b64afe2ac" height="400" width="100%"> |<img src="https://github.com/En-soso-com/Android/assets/77156858/8029984b-6ca2-4a5e-be5b-cd6d17b8123f" height="400" width="100%"> |
+
+|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/20b8fb06-8782-4d22-a60d-61ff42a7fb6e" height="100%" width="700" >|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/b8840d03-affb-4055-b6d8-b7b437911caf" height="100%" width="700"> |
+|:---:|:---:|
+|백테스팅|매매기록 |
+
+|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/2ae2d981-f623-4f4e-8691-15a13c3759cc" height="100%" width="700" >|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/76285f8b-e983-43cb-bd31-bd1d16671ab8" height="100%" width="700"> |<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/819f6e25-5133-40d6-916b-46c68388404c" height="100%" width="700" >|
 |:---:|:---:|:---:|
-|미팅 안내1|미팅 안내2|미팅 안내3|
+|주식 상세정보|주식 차트|주식 뉴스|
 
  
-##  💾 백엔드 
-|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/89cc43da-9595-4dbb-927a-a46ab12f783f">|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/d113c323-e6f1-4b78-bfc4-9a07d881a5ca" height="400" width="100%" > |
-|:---:|:---:|
-|Firbase 사용1|Firbase 사용2|
+##  💾 시스템 설계도
+<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/cdd1c413-e922-4983-a2cc-bac345697f4b">
 
-|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/f9ae7b30-a51a-405a-a998-58c5f2711101" height="400" width="100%">|<img src="https://github.com/AnimalFaceProject/animal_user/assets/77156858/8d4b7aaa-cae3-4527-aa42-39bed357129b" height="400" width="100%"> |
-|:---:|:---:|
-|Firbase 사용3|테이블 구조|
+
 ## ⚙️ 개발 환경
 - `Node.js 20.3.0`
 - `Npm 9.6.7`
