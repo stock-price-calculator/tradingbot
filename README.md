@@ -60,11 +60,12 @@
 - 주식 상세정보
 - 주식 포트폴리오
 
+### 4. 적정주가 계산기
 
 
 ## 📌 프로젝트 메인 페이지
 
-|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/b754f2bc-ebe4-4361-8a69-03c795336574" height="100%" width="100%">|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/a9461264-6c8a-425d-a5b4-21a9fc17fc9b"  height="100%" width="100%"> |
+|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/b754f2bc-ebe4-4361-8a69-03c795336574" height="100%" width="700">|<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/a9461264-6c8a-425d-a5b4-21a9fc17fc9b"  height="100%" width="700"> |
 |:---:|:---:|
 |시작 화면|미팅 참여 화면|
 
