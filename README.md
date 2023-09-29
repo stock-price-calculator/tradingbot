@@ -83,7 +83,7 @@
 
  
 ##  💾 시스템 설계도
-<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/cdd1c413-e922-4983-a2cc-bac345697f4b" height="100%" width="100%" >
+<img src="https://github.com/stock-price-calculator/tradingbot/assets/77156858/68209c4f-63fc-4cd3-bf06-ee0bfa0d56bf" height="100%" width="100%" >
 
 
 ## ⚙️ 개발 환경
